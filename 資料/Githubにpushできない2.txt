@@ -1,0 +1,224 @@
+Next.jsで作業をするため
+yarn dev
+からプロジェクトothelloを作成
+
+すでにGithub上にmc-daigoというアカウントを作ってありそこにpushしたい。
+mc-daigo上ではSSHのキーは設定してある
+
+まずはbahから
+git remote add origin git@github.com:mc-daigo/othello.git
+git branch -M main
+git push -u origin main
+のようにやったがうまくいかず
+新しいSSHキーも作ってGithub上に登録はできたがそこから先どうしていいかわからない。
+
+git remote add origin git@github.com:mc-daigo/othello.git
+でも
+git remote add origin https://github.com/mc-daigo/othello.git
+でも
+error: remote origin already exists.
+と出る。
+
+前も別なカウントでなかなかうまくいかず
+その時の
+git remote set-url origin git@github.com:mc-daigo/othello.git
+と
+ssh -T git@github.com
+と試したが
+Hi daigo-furu! You've successfully authenticated, but GitHub does not provide shell access.
+と出る。
+
+usernameはmc-daigoに書き換えてるはずなのだが前の名前のdaigo-furuと返事が出た。
+
+どうすればいいか？
+
+--------------------
+
+
+GitHubのmc-daigoアカウントでリポジトリに正しく接続できない原因として、SSH設定やGitの設定が以前のdaigo-furuアカウントに紐づいている可能性があります。以下の手順で問題を解決してみてください。
+
+1. 現在のGitリモート設定を確認
+ターミナルで以下を実行して、現在のリモート設定を確認します。
+
+bash
+コードをコピーする
+git remote -v
+出力例:
+
+scss
+コードをコピーする
+origin  git@github.com:daigo-furu/othello.git (fetch)
+origin  git@github.com:daigo-furu/othello.git (push)
+ここでリモートURLがdaigo-furuアカウントのものになっている場合、正しいURLに設定を変更する必要があります。
+
+2. リモートURLを正しいものに設定
+リモートがすでに存在している場合、git remote addは使用できません。その代わり、set-urlを使用します。
+
+bash
+コードをコピーする
+git remote set-url origin git@github.com:mc-daigo/othello.git
+再度リモートURLを確認して、変更が反映されていることを確認します。
+
+bash
+コードをコピーする
+git remote -v
+3. SSHキーの設定を確認
+現在、SSH認証が以前のdaigo-furuアカウントに関連付けられているようです。以下の手順で修正します。
+
+(1) ~/.ssh/configを編集
+複数のGitHubアカウントを使用する場合、~/.ssh/configファイルを設定します。
+
+ターミナルで以下を実行して、設定ファイルを開きます。
+
+bash
+コードをコピーする
+nano ~/.ssh/config
+以下の内容を追加します（mc-daigo用の設定）。
+
+plaintext
+コードをコピーする
+Host github-mc-daigo
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_mc-daigo
+注意:
+
+IdentityFileはmc-daigoアカウント用に作成したSSHキーのパスに置き換えてください（例: ~/.ssh/id_ed25519_mc-daigo）。
+Host github-mc-daigoは任意の名前ですが、一貫性を保つためにmc-daigoに関連する名前を使用してください。
+(2) リモートURLを修正
+SSH設定を反映するため、リモートURLを以下の形式に変更します。
+
+bash
+コードをコピーする
+git remote set-url origin git@github-mc-daigo:mc-daigo/othello.git
+これにより、github-mc-daigo設定が使用されるようになります。
+
+4. 接続テスト
+設定が正しいか確認するため、以下を実行します。
+
+bash
+コードをコピーする
+ssh -T git@github-mc-daigo
+成功すれば以下のメッセージが表示されます。
+
+vbnet
+コードをコピーする
+Hi mc-daigo! You've successfully authenticated, but GitHub does not provide shell access.
+5. Gitの操作を再試行
+すべて設定が正しくなったら、以下を試してみてください。
+
+(1) リモートの確認
+bash
+コードをコピーする
+git remote -v
+出力例:
+
+perl
+コードをコピーする
+origin  git@github-mc-daigo:mc-daigo/othello.git (fetch)
+origin  git@github-mc-daigo:mc-daigo/othello.git (push)
+(2) プッシュ
+bash
+コードをコピーする
+git push -u origin main
+補足
+以前のdaigo-furuアカウント用のSSHキーや設定が不要であれば、削除しても問題ありません。
+複数アカウントを頻繁に切り替える場合、SSH設定を適切に管理することで混乱を防げます。
+
+=======================================
+
+Host github-mc-daigo
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_mc-daigo
+で入力してエンターを押しても反応がない。
+何をすればいいか？
+
+
+-------------------------------
+
+~/.ssh/configファイルの編集後に保存と終了が適切に行われていない可能性があります。以下の手順で、~/.ssh/configファイルを編集し、保存してください。
+
+1. 適切なテキストエディタを使用
+編集時に使用するテキストエディタを確認してください。以下のコマンドを試してみてください。
+
+nano を使用する場合
+nanoを使って編集します。
+bash
+コードをコピーする
+nano ~/.ssh/config
+ファイルの末尾に以下を追加します：
+plaintext
+コードをコピーする
+Host github-mc-daigo
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_mc-daigo
+保存手順：
+編集が終わったら、Ctrl + O を押して保存。
+ファイル名を確認してEnter。
+次に Ctrl + X を押して終了します。
+vim を使用する場合
+vimを使って編集します。
+bash
+コードをコピーする
+vim ~/.ssh/config
+挿入モードに入る：
+キーボードの i を押して、挿入モードに入ります。
+以下を追加：
+plaintext
+コードをコピーする
+Host github-mc-daigo
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_mc-daigo
+保存手順：
+編集が終わったら Esc を押して挿入モードを終了。
+次に :wq を入力してEnterで保存して終了します。
+他のエディタ（VS Codeなど）を使用する場合
+~/.ssh/configをVS Codeで開く。
+bash
+コードをコピーする
+code ~/.ssh/config
+必要な内容を編集して保存します。
+2. 編集後の確認
+編集内容を保存したら、以下のコマンドで正しく反映されているか確認してください。
+
+bash
+コードをコピーする
+cat ~/.ssh/config
+出力例：
+
+plaintext
+コードをコピーする
+Host github-mc-daigo
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa_mc-daigo
+3. 接続テスト
+編集後に以下のコマンドで接続テストを行い、問題がないか確認してください。
+
+bash
+コードをコピーする
+ssh -T git@github-mc-daigo
+もしまだうまくいかない場合、SSHキーのパーミッション（権限）や、~/.ssh/configファイルの権限が適切か確認が必要です。次のコマンドで確認できます：
+
+bash
+コードをコピーする
+ls -l ~/.ssh/
+chmod 600 ~/.ssh/id_rsa_mc-daigo
+chmod 600 ~/.ssh/config
+
+
+
+
+
+
+
+
+
+
+
+ChatGPT の回答は必ずしも正しいとは限りません。重要な情報は確認するようにしてください。
+
+

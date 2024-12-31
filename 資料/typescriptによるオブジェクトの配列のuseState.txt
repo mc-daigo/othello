@@ -1,0 +1,124 @@
+TypeScriptを使っているNext.jsで
+
+type itemType = {
+  href: string,
+  title: string,
+  description: string
+}
+
+const ITEMS:itemType[] = [
+  {
+    href: "https://text1.com",
+    title: "title1",
+    description: "description1"
+   },
+  {
+    href: "https://text2.com",
+    title: "title2",
+    description: "description2"
+   },
+  {
+    href: "https://text3.com",
+    title: "title3",
+    description: "description3"
+   }
+]
+
+const [items, setItems] = useState<itemType[]>([ITEMS])
+
+のようなitemType型の配列ITEMSを作成し
+useStateでitemsの初期値をITEMSにしたかったのだが
+
+型 'itemType[]' には 型 'itemType' からの次のプロパティがありません: href, title, description
+
+というエラーが出る。
+何が間違っているのか？
+
+とりあえずオブジェクトの配列をuseStateでの扱い方が知りたい。
+
+--------------------------------------------------
+
+エラーの原因は、useState<itemType[]>([ITEMS])の初期値に渡しているものが間違っていることです。
+ITEMSはすでにitemType[]型の配列ですので、[ITEMS]とすると、itemType[][]型（二次元配列）になってしまいます。そのため、型が一致せずにエラーになります。
+
+修正方法
+ITEMSはitemType[]型なので、useStateの初期値にそのまま渡せばOKです。修正版は以下のようになります。
+
+tsx
+コードをコピーする
+import { useState } from "react";
+
+type ItemType = {
+  href: string;
+  title: string;
+  description: string;
+};
+
+const ITEMS: ItemType[] = [
+  {
+    href: "https://text1.com",
+    title: "title1",
+    description: "description1",
+  },
+  {
+    href: "https://text2.com",
+    title: "title2",
+    description: "description2",
+  },
+  {
+    href: "https://text3.com",
+    title: "title3",
+    description: "description3",
+  },
+];
+
+export default function App() {
+  const [items, setItems] = useState<ItemType[]>(ITEMS); // ITEMSをそのまま渡す
+
+  return (
+    <div>
+      {items.map((item, index) => (
+        <div key={index}>
+          <a href={item.href}>{item.title}</a>
+          <p>{item.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+解説
+ITEMSの型について
+
+ITEMSはitemType[]型の配列として定義されています。
+useStateの初期値に渡す際も型が一致していなければエラーになります。
+間違った記述
+
+tsx
+コードをコピーする
+const [items, setItems] = useState<itemType[]>([ITEMS]); // エラー
+[ITEMS]はitemType[]型の配列をさらに配列に入れるので、結果としてitemType[][]型（二次元配列）になります。
+useState<itemType[]>(...)は一次元の配列を期待しているため型の不一致が発生します。
+正しい記述
+
+tsx
+コードをコピーする
+const [items, setItems] = useState<itemType[]>(ITEMS); // OK
+ITEMSそのものがitemType[]型なので、初期値としてそのまま渡せば型が一致します。
+オブジェクトの配列をuseStateで扱う際の注意点
+初期値を正しく指定する 初期値は期待される型と一致していなければなりません。
+
+例: useState<ItemType[]>([])は空の配列を初期値にする場合など。
+状態を更新する際の注意 状態を直接変更せず、必ずsetItemsを使って新しい配列を設定します。
+
+tsx
+コードをコピーする
+const addItem = () => {
+  setItems((prevItems) => [
+    ...prevItems,
+    { href: "https://newitem.com", title: "New Item", description: "New Description" },
+  ]);
+};
+これで、オブジェクトの配列をuseStateで安全に扱えます！
+
+
+=======================================================
