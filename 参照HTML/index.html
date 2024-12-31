@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="window.css">
+  <link rel="stylesheet" href="board.css">
+  <link rel="stylesheet" href="footer.css">
+  <title>Othello</title>
+</head>
+<body>
+  <header class="header">
+    <h1 class="title">Ohtello</h1>
+  </header>
+  <main class="main">
+    <div class="window">
+      <div class="turnBox">
+        <p class="turnPlayer"><span>黒</span>のターン</p>
+        <p class="turnCount">1</p>
+      </div>
+      <div class="messageBox">
+        <p class="message">一人で黒と白を順番に虚しく配置してください。<br>先手は黒からです。<br>石の置ける場所をクリックすれば進められます。</p>
+      </div>
+      <div class="buttonBox">
+        <button class="button">パス</button>
+      </div>
+    </div>
+    <div class="board">
+      <ul class="squares">
+        <li class="dot"></li>
+        <li class="dot"></li>
+        <li class="dot"></li>
+        <li class="dot"></li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="0" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="3">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="4">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="0" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="1" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="3">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="4">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="1" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="2" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="3">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="4">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="2" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="3" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="3" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="3" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="3" data-column="3">
+              <p class="white" data-stone="white">
+            </li>
+            <li class="square" role="button" data-row="3" data-column="4">
+              <p class="black" data-stone="black">
+            </li>
+            <li class="square" role="button" data-row="3" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="3" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="3" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="4" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="4" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="4" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="4" data-column="3">
+              <p class="black" data-stone="black">
+            </li>
+            <li class="square" role="button" data-row="4" data-column="4">
+              <p class="white" data-stone="white">
+            </li>
+            <li class="square" role="button" data-row="4" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="4" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="4" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="5" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="3">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="4">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="5" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="6" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="3">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="4">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="6" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="row">
+          <ul class="column">
+            <li class="square" role="button" data-row="7" data-column="0">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="1">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="2">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="3">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="4">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="5">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="6">
+              <p class="none" data-stone="none"></p>
+            </li>
+            <li class="square" role="button" data-row="7" data-column="7">
+              <p class="none" data-stone="none"></p>
+            </li>
+          </ul>
+        </li>
+        <li class="columnScale">
+          <ul>
+            <li>a</li>
+            <li>b</li>
+            <li>c</li>
+            <li>d</li>
+            <li>e</li>
+            <li>f</li>
+            <li>g</li>
+            <li>h</li>
+          </ul>
+        </li>
+        <li class="rowScale">
+          <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- 以下はテスト用なので最終的に削除 -->
+      <div class="testinput">
+        <select name="column" class="selectColumn">
+          <option value="">column</option>
+          <option value="0">a</option>
+          <option value="1">b</option>
+          <option value="2">c</option>
+          <option value="3">d</option>
+          <option value="4">e</option>
+          <option value="5">f</option>
+          <option value="6">g</option>
+          <option value="7">h</option>
+        </select>
+        <select name="row" class="selectRow">
+          <option value="">row</option>
+          <option value="0">1</option>
+          <option value="1">2</option>
+          <option value="2">3</option>
+          <option value="3">4</option>
+          <option value="4">5</option>
+          <option value="5">6</option>
+          <option value="6">7</option>
+          <option value="7">8</option>
+        </select>
+        <select name="stone" class="selectStone">
+          <option value="black">黒</option>
+          <option value="white">白</option>
+        </select>
+        <button class="changeButton">反転</button>
+      </div>
+
+    </div>
+  </main>
+  <footer class="footer">
+    <p class="credit">React + TypeScript + Next.js Sample</p>
+  </footer>
+
+
+<script>
+
+let globalRow = 0; // 行
+let globalColumn = 0; // 列
+let isAnimating = false; // アニメーション中か
+
+const selectRow = document.querySelector('.selectRow');
+const selectColumn = document.querySelector('.selectColumn');
+const selectStone = document.querySelector('.selectStone');
+const changeButton = document.querySelector('.changeButton');
+
+// セレクターで行の番号を取得
+selectRow.addEventListener('change', () => {
+  if(selectRow.value){
+    globalRow = Number(selectRow.value)
+  }
+  console.log('globalRow：'+ globalRow)
+})
+
+// セレクターで列の番号を取得
+selectColumn.addEventListener('change', () => {
+  if(selectColumn.value){
+    globalColumn = Number(selectColumn.value)
+  }
+  console.log('globalColumn：'+ globalColumn)
+})
+
+// 反転ボタンを押すと指定した行と列の石をひっくり返す
+changeButton.addEventListener('click', () => {
+  flipStone(globalRow, globalColumn)
+})
+
+// マス要素からdata-rowとdata-columnを数字として取得して配列で返す
+const getCoordinate = (square) => {
+  const row = Number(square.dataset.row);
+  const column = Number(square.dataset.column);
+  return [row, column]
+}
+
+// マス要素を全部取得してそれぞれをsquareとして処理
+document.querySelectorAll('li.square').forEach(square => {
+  // squareがクリックされたとき
+  square.addEventListener('click', () => {
+    if (isAnimating) return; // アニメーション中は無効
+
+    console.log(getCoordinate(square))
+    // squareの中の<p>をstoneとして取得
+    const stone = square.querySelector('p')
+  
+    // stoneのクラスが'none'の場合のみ実行（今回はdata-stoneを見るやり方にしてるがこちらでもいい）
+    // if(stone.classList.contains('none')) {
+
+    // stoneのdata-stoneが'none'の場合のみ実行
+    if(stone.dataset.stone === 'none') {
+      isAnimating = true; // アニメーション開始
+      // クラス'none'の削除
+      stone.classList.remove('none');
+      // 指定した 'black' か 'white' と 配置アニメ用の'placing'をクラスに追加
+      stone.classList.add(selectStone.value, 'placing');
+      // CSSアニメ（@keyframes）終了後に実行
+      stone.addEventListener('animationend', () => {
+        // アニメーション終了後に 'placing' を削除
+        stone.classList.remove('placing');
+        // data-stoneを新しい色に変更
+        stone.dataset.stone = selectStone.value;
+        isAnimating = false; // アニメーション中のフラグを消す
+      }, { once: true }); // イベントを一度だけ実行
+    }
+  });
+});
+
+// 指定した座標の石がひっくり返る
+const flipStone = (row, column) => {
+  if (isAnimating) return; // アニメーション中は操作を無効化
+
+  isAnimating = true; // アニメーション開始
+  // 動的に指定して要素をsquareとして取得（data-rowとdata-columnを指定）
+  const square = document.querySelector(`.square[data-row="${row}"][data-column="${column}"]`);
+  // squareの<p>をstoneとして取得
+  const stone = square.querySelector('p');
+  console.log(stone.dataset.stone)
+  // stoneのdata-stoneがnoneじゃない場合のみ実行
+  if(stone.dataset.stone !== 'none'){
+    // 黒用のアニメーションパターンクラス名の順番
+    const blackSteps = ['black', 'change_b', 'change_n', 'change_w', 'white'];
+    // 白用は黒用がひっくり返る
+    const whiteseSteps = [...blackSteps].reverse();
+    // data-stoneを確認して黒か白かのどちらかステップ配列を決定
+    const stepSequence = stone.dataset.stone === 'black' ? blackSteps : whiteseSteps;
+    // 現在のステップ数を宣言
+    let currentStep = 0;
+    // 時間ごとに自動で繰り返し
+    const interval = setInterval(() => {
+    // クラスをステップの配列から次に切り替える
+    stone.className = stepSequence[currentStep];
+    // ステップ数を追加
+    currentStep++;
+
+    // 最後のクラスに到達したらdataを書き換えて停止
+    if (currentStep > stepSequence.length -1) {
+      // 最終的にdata-stoneを最後のクラス名と同じに変更
+      stone.dataset.stone = stepSequence[stepSequence.length -1];
+      clearInterval(interval); // タイマー停止
+      isAnimating = false; // アニメーション終了
+    }
+  }, 50); // 50ms間隔でクラスを変更
+  }
+}
+
+</script>
+</body>
+</html>

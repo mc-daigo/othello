@@ -1,0 +1,186 @@
+Next.jsにて
+
+<Link className={styles.anchor} href="/">
+  Index
+</Link>
+<Link className={styles.anchor} href="/about">
+  About
+</Link>
+があるコンポーネントを src\app\page.tsx と src\app\about\page.tsx それぞれが使っていてお互い行き来できるページが有る。
+
+hooksで src\hooks\useBgLightBlue.tsx というのを作成して
+
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+
+export const useBgLightBlue = () => {
+  const router = useRouter()
+  console.log(router)
+  useEffect(() => {
+     document.body.style.backgroundColor = router.pathname === "/" ? "lightblue" : "beige"
+    return () => {
+      document.body.style.backgroundColor = ""
+    }
+  }, [router.pathname])
+}
+と記述してパスにより背景色を変えたいのだが
+
+Unhandled Runtime Error
+Error: NextRouter was not mounted. https://nextjs.org/docs/messages/next-router-not-mounted
+
+というエラーが出てしまう。
+
+どうすればいいか？
+
+-------------------------
+
+useRouter を Next.js の app ディレクトリで使う場合、エラーが発生する原因は useRouter が app ディレクトリの新しいアーキテクチャ（Server Components）に対応していないためです。useRouter は従来の pages ディレクトリで主に使用される仕組みです。
+
+app ディレクトリでは、代わりに usePathname を使用すると適切に機能します。以下のように修正することで問題を解消できます。
+
+修正案: usePathname を使用
+usePathname は app ディレクトリでの現在のパスを取得するためのフックです。これを使って背景色を切り替えましょう。
+
+修正コード
+tsx
+コードをコピーする
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+
+export const useBgLightBlue = () => {
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    // パスによって背景色を切り替える
+    document.body.style.backgroundColor = pathname === "/" ? "lightblue" : "beige";
+    
+    return () => {
+      // クリーンアップ: 背景色をリセット
+      document.body.style.backgroundColor = "";
+    };
+  }, [pathname]);
+};
+背景色変更の適用
+上記のカスタムフックをそれぞれのページコンポーネントで使用します。
+
+例:
+
+src/app/page.tsx
+tsx
+コードをコピーする
+import { useBgLightBlue } from "../hooks/useBgLightBlue";
+
+export default function Page() {
+  useBgLightBlue();
+
+  return (
+    <main>
+      <h1>Index Page</h1>
+      <a href="/about">Go to About</a>
+    </main>
+  );
+}
+src/app/about/page.tsx
+tsx
+コードをコピーする
+import { useBgLightBlue } from "../../hooks/useBgLightBlue";
+
+export default function AboutPage() {
+  useBgLightBlue();
+
+  return (
+    <main>
+      <h1>About Page</h1>
+      <a href="/">Go to Index</a>
+    </main>
+  );
+}
+解説
+usePathname を使用する理由
+
+useRouter は pages ディレクトリでの使用を前提としており、app ディレクトリでは未対応です。
+usePathname は app ディレクトリのアプローチに適応した新しいフックです。
+背景色の設定
+
+現在のパス名を監視して、useEffect 内で document.body.style.backgroundColor を設定します。
+return 内でリセット処理を記述することで、コンポーネントがアンマウントされた際にスタイルを元に戻します。
+適用範囲
+
+ページ遷移時に動作することを確認してください。Next.js の新しいアーキテクチャに準拠しています。
+これで app ディレクトリ環境でもエラーが出ず、パスに応じた背景色の切り替えが正常に動作するはずです。
+
+=============================
+
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+
+const pathname = usePathname()
+export const useBgLightBlue = () => {
+
+  useEffect(() => {
+    document.body.style.backgroundColor = pathname === "/" ? "lightblue" : "beige";
+    return () => {
+      document.body.style.backgroundColor = ""
+    }
+  }, [pathname])
+}
+のように
+pathnameをuseBgLightBlueの外で定義すると
+Unhandled Runtime Error
+
+Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
+とエラーが出た。
+中でないと使えないのか？
+
+----------------------------------
+
+
+はい、その通りです。usePathname や他の React フック（例えば useState、useEffect など）は「React フックのルール」に従う必要があります。このルールにより、フックは以下の条件を満たす場合にのみ使用できます：
+
+フックのルール
+React関数コンポーネントまたはカスタムフックの内部で呼び出す必要がある。
+フックはトップレベルで呼び出されなければならず、条件分岐やループ内で呼び出すことはできない。
+エラーの原因
+以下のコード:
+
+tsx
+コードをコピーする
+const pathname = usePathname();
+を useBgLightBlue の外側に書いた場合、usePathname を「関数コンポーネントやカスタムフックの中」ではなく、「通常の関数や変数定義」の中で呼び出してしまっています。これは React フックのルールを破るため、エラーが発生します。
+
+修正方法
+usePathname は必ず useBgLightBlue の内部で呼び出してください。
+
+修正済みのコード例:
+
+tsx
+コードをコピーする
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+
+export const useBgLightBlue = () => {
+  const pathname = usePathname(); // カスタムフック内で呼び出す
+
+  useEffect(() => {
+    document.body.style.backgroundColor = pathname === "/" ? "lightblue" : "beige";
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, [pathname]); // pathname を依存配列に設定
+};
+理由
+フックのライフサイクル
+
+React フックはライフサイクルに基づいて動作します。そのため、カスタムフック内でフックを呼び出すことで、React が正しくその動作を管理できます。
+フックのスコープ
+
+usePathname は実行時に動的なデータ（現在のパス）を提供します。カスタムフックやコンポーネントの内部で呼び出すことで、このデータを利用可能なスコープに限定します。
+よくあるミス
+フックを条件分岐やループ内で呼び出す。
+フックを関数の外側で呼び出す（今回のケース）。
+フックを非 React 関数内で呼び出す。
+これらのミスを避けることで、エラーなくフックを活用できます。

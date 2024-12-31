@@ -1,0 +1,254 @@
+===========================================
+【Github】
+daigotitan
+https://github.co.jp/
+https://github.com/daigotitan
+https://github.com/daigotitan/mao-seminar
+https://github.com/daigotitan/pull-request-practice
+Username : daigotitan
+Email : daigofuruuchi@gmail.com
+pass : scheda999
+
+
+
+https://github.com/daigotitan/GitTest
+https://github.com/daigotitan/GitTest.git
+
+
+---------------------------------------
+Username : waodaigo
+Email : wao_daigo@yahoo.co.jp
+pass : scheda999
+
+---------------------------------------
+Username : daigo-furuuchi
+Email : daigo_furuuchi@yahoo.co.jp
+pass : scheda999
+git用パスフレーズ：scheda999
+
+
+===========================================
+【Github】
+mc_daigo
+https://github.com/mc-daigo
+
+Username : mc-daigo
+Email : tanishisama@yahoo.co.jp
+pass : scheda999
+
+公開ページ
+https://mc-daigo.github.io/portfolio/
+https://mc-daigo.github.io/portfolio/javascript/
+https://github.com/mc-daigo/portfolio.git
+
+
+
+===========================================
+【Backlog】
+https://backlog.com/ja/
+https://daigo-bl.backlog.com/dashboard
+ID：daigo-bl
+組織名：古内
+名前：古内大悟
+メール：daigo_furuuchi@yahoo.co.jp
+パスワード：tenunu999
+
+------------------------------
+プロジェクト名：Backlogテスト
+プロジェクトキー：BLTEST
+　リポジトリ名：git_test1
+　リポジトリURL：https://daigo-bl.backlog.com/git/BLTEST/git_test1.git
+　リポジトリ名：git_test2
+　リポジトリURL：https://daigo-bl.backlog.com/git/BLTEST/git_test2.git
+　リポジトリ名：mc_portfolio
+　リポジトリURL：https://daigo-bl.backlog.com/git/BLTEST/mc_portfolio.git
+　リポジトリ名：Backlog_Git_Test
+　リポジトリURL：https://daigo-bl.backlog.com/git/BLTEST/Backlog_Git_Test.git
+
+追加ユーザー
+　wao_daigo@yahoo.co.jp
+　tanishisama@yahoo.co.jp
+　furuuchi.daigo@members.co.jp
+　daigofuruuchi@gmail.com
+　全員のパスワード：tenunu999
+
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+ユーザー切り替え
+https://qiita.com/ryunosuke0922/items/15fa3ed9d5f35f497511
+
+https://qiita.com/ykoizumi0903/items/44e24d4180ae931552ce
+
+https://note.nkmk.me/git-config-setting/
+
+
+git config --local user.name daigo-furuuchi
+git config --local user.email daigo_furuuchi@yahoo.co.jp
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+==============================
+同じパソコンのSourceTreeを使って別のユーザー（Eメール）で使い分けたい。
+どのようにすれば実現できるか？
+
+---------------------------------------
+SourceTreeで複数のユーザー（Eメール）を使い分けるには、以下の手順に従ってください。
+
+アカウントの追加: SourceTreeを開き、メニューバーから「ツール」→「オプション」を選択します。左側のメニューで「認証」を選択し、「アカウントを追加」をクリックします。
+新しいアカウントの設定: ダイアログボックスが表示されるので、新しいユーザーのEメールアドレスとパスワードを入力し、「認証」ボタンをクリックします。
+アカウントの切り替え: メニューバーの右上にあるアイコンから、切り替えたいアカウントを選択します。これにより、ソース管理システムに接続されているリポジトリがそのアカウントに切り替わります。
+以上の手順で、SourceTreeを同じパソコンで複数のユーザー（Eメール）で使い分けることができます。
+
+==============================
+認証のアカウント追加はあるがそこからEメール入力ができない。
+選べる項目は以下の通り
+・Host
+　-ホスティングサービス
+　-優先するプロトコル
+・Credentials
+　-認証
+　-ユーザー名
+
+ホスティングサービスはとりあえずGitHub、優先するプロトコルはHTTTPSでいいがCredentialsの認証を何を選べばいいかわからない。
+OAuthとPersonal Access Tokenから選ぶようだった。
+ユーザー名はメールアドレスか？
+OAuthトークンを再読み込みというボタンがあり、一度押せたがその後は押せなくなった。
+---------------------------------------
+
+Credentialsの認証方法としては、GitHubの場合、通常はOAuthを選択します。OAuthを選択した場合、SourceTreeはGitHubにリダイレクトされ、GitHubでアプリケーションへのアクセスを許可するためのページが表示されます。そこで、「許可」をクリックすると、SourceTreeがGitHubにアクセスできるようになります。
+
+ユーザー名にはGitHubのユーザー名を入力します。また、Personal Access Tokenを使う場合は、GitHubのサイトでトークンを生成して、SourceTreeにコピー＆ペーストします。
+
+OAuthトークンを再読み込みボタンが押せなくなった場合、SourceTreeを再起動してみるか、一度認証を解除してから再度追加することでトークンを再読み込みできるかもしれません。
+
+==============================
+OAuthトークンを再読み込みを押すとブラウザに
+Authorize SourcetreeForWindows
+という画面が出た。
+CancelかAuthorize atlassianを選べるがどうするべきか？
+---------------------------------------
+"Authorize SourcetreeForWindows" 画面が表示された場合、"Authorize" を選択してください。これにより、SourceTreeがAtlassianのサービスにアクセスし、トークンを再読み込みすることができます。 "Cancel" を選択すると、認証プロセスが中止され、トークンは再読み込みされません。
+
+
+==============================
+Backlogのアカウントを追加する場合はどうすればよかったか？
+---------------------------------------
+
+BacklogのアカウントをSourceTreeに追加するには、以下の手順に従います。
+
+SourceTreeを開き、メニューバーから「ツール」→「オプション」を選択します。
+左側のメニューで「認証」を選択し、「アカウントを追加」をクリックします。
+ホスティングサービスとして「その他」を選択します。
+ホスティングサービスのURLにはBacklogのURLを入力します。
+優先するプロトコルはHTTPSを選択します。
+Credentialsの認証方法としては、おそらくBasic認証またはOAuthが必要になるかと思います。Backlogの場合、Basic認証を使用することが一般的です。Basic認証を選択し、ユーザー名とパスワードを入力します。
+認証情報を追加した後、アカウントを選択して認証を完了します。
+これでSourceTreeからBacklogアカウントにアクセスできるようになります。ただし、Backlogの認証方法や設定によっては、手順が異なる場合がありますので、Backlogの公式ドキュメントやサポートを参照することをお勧めします。
+
+
+==============================
+その他は選べない。
+Azure DevOpsというのなら選べて、そこならホストURLを入れることができるがこれでよいのか？
+それとも別か？
+---------------------------------------
+その場合、SourceTreeでBacklogのアカウントを追加する方法は次のようになります。
+
+SourceTreeを開き、メニューバーから「ツール」→「オプション」を選択します。
+左側のメニューで「認証」を選択し、「アカウントを追加」をクリックします。
+ホスティングサービスとして「Azure DevOps」を選択します。
+ホスティングサービスのURLにはBacklogのURLを入力します。
+優先するプロトコルはHTTPSを選択します。
+認証方法としては、Basic認証やOAuthなどが使えるかもしれません。一般的にはBasic認証を使用することが多いです。Basic認証を選択し、ユーザー名とパスワードを入力します。
+認証情報を追加した後、アカウントを選択して認証を完了します。
+これでSourceTreeからBacklogアカウントにアクセスできるようになります。ただし、認証方法や設定によっては手順が異なる場合がありますので、Backlogの公式ドキュメントやサポートを参照することをお勧めします。
+
+
+
+==============================
+GitHubのユーザー追加に戻る。
+一度認証からメインのユーザーを追加した後、サブのユーザーをGitHubを使えるように追加したい。
+認証から追加をしてOAuthトークンを再読み込みボタンを押してもアカウントがすでに存在しますとなってこれ以上追加できない。
+どうすればいいか？
+
+---------------------------------------
+GitHubのアカウントをSourceTreeに追加する場合、OAuthトークンを使用して追加すると、同じGitHubアカウントを再度追加することはできません。メインのユーザーとサブのユーザーを切り替える場合は、次のような方法が考えられます。
+
+1.OAuthトークンを削除: メインのユーザーのOAuthトークンをSourceTreeから削除します。これにより、メインのユーザーのアカウントがSourceTreeから削除されます。削除するには、SourceTreeのオプションからアカウントを選択し、削除することができます。
+2.サブのユーザーを追加: OAuthトークンを使用してサブのユーザーを追加します。SourceTreeで新しいアカウントを追加し、OAuthトークンを入力してサブのユーザーを認証します。
+3.切り替え: SourceTreeのユーザー切り替え機能を使用して、メインのユーザーとサブのユーザーを切り替えます。これにより、必要に応じてメインのユーザーやサブのユーザーで作業をすることができます。
+これらの手順に従うことで、SourceTreeでメインのユーザーとサブのユーザーを切り替えることができます。
+
+==============================
+1は無意味なのでやらない。2は「新しいアカウントを追加」そのものができないので不可能。
+3の方法を詳しく説明してほしい。
+---------------------------------------
+申し訳ありません、誤解がありました。以下に、SourceTreeでユーザーを切り替える方法を詳しく説明します。
+
+メインのユーザーとサブのユーザーを追加: 最初にメインのユーザーをOAuthトークンを使用して追加します。その後、サブのユーザーをOAuthトークンを使用して追加します。
+ユーザーの切り替え:
+SourceTreeを開きます。
+メニューバーの右上にあるアイコンをクリックして、現在のアカウントを表示します。
+表示されたメニューから、切り替えたいアカウントを選択します。これにより、アカウントが切り替わり、指定したアカウントでリポジトリにアクセスできるようになります。
+リポジトリの切り替え:
+リポジトリ一覧から、切り替えたいリポジトリを右クリックします。
+表示されたメニューから、"Switch To"を選択します。
+切り替えたいアカウントが表示されるので、その中から選択します。これにより、選択したアカウントでリポジトリが切り替わります。
+この方法で、SourceTreeでメインのユーザーとサブのユーザーを切り替えることができます。
+
+
+==============================
+
+すでに単独でローカルリポジトリを作ったあとで、GitHubなどのリモートリポジトリにプッシュしたい。
+どうすればよいか？
+できるとしたらあらかじめGitHubにリポジトリを作っておく必要があるのか？
+
+---------------------------------
+
+はい、ローカルリポジトリを既に作成している場合、それをGitHubなどのリモートリポジトリにプッシュすることは可能です。以下の手順に従ってください：
+
+1. GitHubにリモートリポジトリを作成する
+
+　1.GitHubにログインし、右上の「+」ボタンをクリックして「New repository」を選択します。
+　2.リポジトリ名を入力し、必要に応じてその他のオプションを設定して「Create repository」ボタンをクリックします。
+
+2. ローカルリポジトリにリモートリポジトリを追加する
+
+ローカルリポジトリで以下のコマンドを実行します。このコマンドでは、GitHubで作成したリモートリポジトリのURLを指定します。
+
+git remote add origin git@github.com:your-username/your-repo.git
+
+ここで、git@github.com:your-username/your-repo.git はGitHubで作成したリポジトリのSSH URLです。HTTPS URLを使用する場合は、https://github.com/your-username/your-repo.git を使用します。
+
+3. 初回のプッシュを実行する
+
+以下のコマンドを実行して、ローカルリポジトリの内容をリモートリポジトリにプッシュします。
+
+
+git push -u origin master
+ここで、master はプッシュするブランチ名です。あなたのブランチ名が異なる場合は、そのブランチ名を使用してください。
+
+例
+具体的な手順を例で示します。
+
+1.GitHubでリポジトリを作成し、リポジトリのURLが git@github.com:user1/my-repo.git であるとします。
+2.ローカルリポジトリで以下のコマンドを実行します。
+
+git remote add origin git@github.com:user1/my-repo.git
+
+次に、以下のコマンドを実行してリモートリポジトリにプッシュします。
+
+git push -u origin master
+
+これで、ローカルリポジトリの内容がGitHubのリモートリポジトリにアップロードされます。
+
+以上の手順で、既に存在するローカルリポジトリをリモートリポジトリにプッシュすることができます。
+
+
+
+
+
+
+
+
