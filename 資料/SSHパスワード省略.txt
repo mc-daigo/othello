@@ -1,0 +1,73 @@
+先程のGitのリポジトリでpushのたびにいちいちSSHのキーワードを聞いてくるようになった。
+面倒なので省略したいのだがどうにかならないか？
+
+
+-------------------------------
+GitでSSHキーのパスフレーズを省略するには、SSHエージェントを利用してキーをキャッシュする方法があります。以下の手順で設定できます。
+
+1. SSHエージェントを起動する
+SSHエージェントは、キーをメモリに保存して一定期間キャッシュします。
+
+Linux/macOS
+ターミナルで以下のコマンドを実行:
+
+bash
+コードをコピーする
+eval "$(ssh-agent -s)"
+Windows（PowerShell）
+Git BashやPowerShellで以下を実行:
+
+bash
+コードをコピーする
+eval $(ssh-agent -s)
+実行後、SSHエージェントが起動し、プロセスID（PID）が表示されます。
+
+2. SSHキーをエージェントに追加する
+次に、使用するSSHキーをエージェントに登録します。
+
+bash
+コードをコピーする
+ssh-add ~/.ssh/id_rsa_mc-daigo
+注意:
+
+~/.ssh/id_rsa_mc-daigo は使用するSSHキーのパスに置き換えてください。
+実行時にパスフレーズを聞かれます。このとき入力する必要がありますが、一度追加されると、再起動するまでキャッシュされます。
+3. 自動起動の設定（オプション）
+コンピュータを再起動した後もSSHエージェントが自動で起動するようにしたい場合は、以下の設定を行います。
+
+macOS/Linux
+.bashrc または .zshrc に以下を追記:
+
+bash
+コードをコピーする
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa_mc-daigo
+Windows（Git Bash）
+Git Bashの~/.bash_profileに以下を追記:
+
+bash
+コードをコピーする
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_rsa_mc-daigo
+Windows（PowerShell）
+PowerShellのプロファイル（例: ~\Documents\WindowsPowerShell\profile.ps1）に以下を追加:
+
+powershell
+コードをコピーする
+Start-Service ssh-agent
+ssh-add ~/.ssh/id_rsa_mc-daigo
+4. SSHキーが正しく追加されているか確認
+以下のコマンドで確認できます:
+
+bash
+コードをコピーする
+ssh-add -l
+登録されているSSHキーのリストが表示されれば、設定は完了です。
+
+これで期待される動作
+次回からGitのpushやpullを行う際、SSHキーのパスフレーズを入力する必要がなくなります。
+
+もしそれでも解消しない場合、以下も確認してください：
+
+使用しているキーが正しいか (~/.ssh/id_rsa_mc-daigo)
+GitリモートURLがSSH形式になっているか (git@github.com:mc-daigo/othello.git)
