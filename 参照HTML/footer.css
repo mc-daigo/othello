@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+.footer{
+  background: linear-gradient(-135deg, #1F6ED4, #39BAE8);
+  width:100%;
+  height:auto;
+  margin:0 auto;
+  overflow: hidden;
+  padding: 10px 0;
+}
+.credit{
+  color:#fff;
+  text-align: center;
+  margin:5px auto 0;
+}

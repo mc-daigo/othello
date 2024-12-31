@@ -1,0 +1,31 @@
+少し前のNext.jsでは_app.jsxというのがあったのだが今はなくなっている。
+代わりのものはあるのか？
+global.cssはどこが読み込んでいるのか？
+
+
+
+
+メモリを更新しました
+最近のNext.js では、_app.js (または _app.tsx) ファイルが使用されない場合があります。Next.js のバージョン13以降、特に App Router が導入されたことで、ファイル構成が変わり、従来の _app.js に相当する機能は次のような形で実装されています。
+
+_app.js の代わりとしての layout.js
+App Router を使う場合、代わりに各ルートに対して layout.js または layout.tsx を使用します。layout.js ファイルは特定のディレクトリの直下に配置し、そのディレクトリに関連するページ全体で共有されるコンポーネントやスタイルを定義するために使います。
+
+ルートレベルの layout.js：プロジェクト全体のレイアウトを定義する場合、src/app/layout.js が基本となります。
+ネストされた layout.js：特定のルート（例えば /dashboard）だけに適用するレイアウトを定義するために、src/app/dashboard/layout.js のように使用します。
+global.css の読み込み
+従来の _app.js の代わりに、App Router を使用するプロジェクトでは global.css は src/app/layout.js ファイルで直接インポートして読み込みます。たとえば、次のように書きます：
+
+javascript
+コードをコピーする
+// src/app/layout.js
+import './globals.css'; // グローバルなスタイルシートをインポート
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+このようにして globals.css を一度インポートすれば、全ページに適用されます。
