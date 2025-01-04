@@ -1,7 +1,16 @@
 "use client";
+import { useContext } from "react";
 import styles from "./Board.module.css"
+import { GlobalValueContext } from "../providers/GlobalValueProvider";
 
 export const Board = () => {
+  // contextのテンプレート
+  const context = useContext(GlobalValueContext)
+  if (!context) {
+    throw new Error("GlobalValueContext must be used within GlobalValueProvider");
+  }
+  const {isBlack, changePlayer, countUp, squares, clickSquare, handleAnimationEnd} = context
+
   return (
     <div className={styles.board}>
       <ul className={styles.squares}>
@@ -9,6 +18,48 @@ export const Board = () => {
         <li className={styles.dot}></li>
         <li className={styles.dot}></li>
         <li className={styles.dot}></li>
+
+
+        {
+          squares.map((row, rowIndex) => {
+            return (
+              <li className={styles.row} key={rowIndex}>
+                <ul className={styles.column}>
+                  {
+                    row.map((stone, columnIndex) => {
+                      return (
+                        <li
+                          className={styles.square}
+                          role="button"
+                          data-row={rowIndex}
+                          data-column={columnIndex}
+                          key={columnIndex}
+                          onClick={clickSquare}
+                        >
+                          <p
+                            className={stone
+                              .split(" ") // スペースで分割して配列に
+                              .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
+                              .join(" ")} // 配列をスペースで結合してクラス名文字列を生成}
+                            data-stone={stone}
+                            onAnimationEnd={() => handleAnimationEnd(rowIndex, columnIndex)}>
+                          </p>
+                        </li>
+                      )
+                    }
+                  )}
+                </ul>
+              </li>
+            )
+          })
+        }
+
+
+
+
+
+
+{/* 
         <li className={styles.row}>
           <ul className={styles.column}>
             <li className={styles.square} role="button" data-row="0" data-column="0">
@@ -233,6 +284,8 @@ export const Board = () => {
             </li>
           </ul>
         </li>
+ */}
+
         <li className={styles.columnScale}>
           <ul>
             <li>a</li>
@@ -283,11 +336,12 @@ export const Board = () => {
           <option value="6">7</option>
           <option value="7">8</option>
         </select>
-        <select name="stone" className={styles.selectStone}>
+        <select name="stone" className={styles.selectStone} onChange={changePlayer}>
           <option value="black">黒</option>
           <option value="white">白</option>
         </select>
         <button className={styles.changeButton}>反転</button>
+        <button className={styles.countButton} onClick={countUp}>カウントアップ</button>
       </div>
 
     </div>

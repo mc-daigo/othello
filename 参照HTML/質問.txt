@@ -1781,8 +1781,746 @@ if (square) {
 
 
 ==========================
+Reactにする前のCSSとJavaScriptではオセロのアプリを
+
+<li class="row">
+  <ul class="column">
+    <li class="square" role="button" data-row="0" data-column="0">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="1">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="2">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="3">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="4">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="5">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="6">
+      <p class="none" data-stone="none"></p>
+    </li>
+    <li class="square" role="button" data-row="0" data-column="7">
+      <p class="none" data-stone="none"></p>
+    </li>
+  </ul>
+</li>
+
+を8個作るような形で8*8を作っており
+
+CSSは
+
+.black,
+.white{
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  position: absolute;
+  z-index: 1;
+  transition: transform 0.3s ease, background-color 0.3s ease; /* なめらかなアニメーション */
+}
+.black{
+  background-color: #000;
+}
+.white{
+  background-color: #fff;
+}
+
+/* 配置中のアニメーション */
+.placing {
+  animation: scaleUp 0.3s ease; /* 拡大アニメーション */
+}
+
+/* アニメーションの定義 */
+@keyframes scaleUp {
+  0% {
+    transform: scale(1.8); /* 通常サイズ */
+  }
+
+  100% {
+    transform: scale(1); /* 元のサイズ */
+  }
+}
+
+
+と設定してnoneからblackやwhiteに変わるときにplacingも追加することで配置アニメーションをつけていた
+
+
+JavaScriptで
+
+// マス要素を全部取得してそれぞれをsquareとして処理
+document.querySelectorAll('li.square').forEach(square => {
+  // squareがクリックされたとき
+  square.addEventListener('click', () => {
+    if (isAnimating) return; // アニメーション中は無効
+
+    console.log(getCoordinate(square))
+    // squareの中の<p>をstoneとして取得
+    const stone = square.querySelector('p')
+  
+    // stoneのdata-stoneが'none'の場合のみ実行
+    if(stone.dataset.stone === 'none') {
+      isAnimating = true; // アニメーション開始
+      // クラス'none'の削除
+      stone.classList.remove('none');
+      // 指定した 'black' か 'white' と 配置アニメ用の'placing'をクラスに追加
+      stone.classList.add(selectStone.value, 'placing');
+      // CSSアニメ（@keyframes）終了後に実行
+      stone.addEventListener('animationend', () => {
+        // アニメーション終了後に 'placing' を削除
+        stone.classList.remove('placing');
+        // data-stoneを新しい色に変更
+        stone.dataset.stone = selectStone.value;
+        isAnimating = false; // アニメーション中のフラグを消す
+      }, { once: true }); // イベントを一度だけ実行
+    }
+  });
+});
+
+
+のような形にして isAnimating によりアニメーション中は動作無効にして
+'animationend'でアニメーション終了後にplacingの削除やisAnimating = false;
+などを行っている。
+これをReactでもやりたい。
+
+先程の
+
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "white", "black", "none", "none", "none",],
+  ["none", "none", "none", "black", "white", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+]
+
+const [squares, setSquares] = useState<string[][]>(SQUARES)
+
+{
+  squares.map((row, rowIndex) => {
+    return (
+      <li className={styles.row} key={rowIndex}>
+        <ul className={styles.column}>
+          {
+            row.map((stone, columnIndex) => {
+              return (
+                <li
+                  className={styles.square}
+                  role="button"
+                  data-row={rowIndex}
+                  data-column={columnIndex}
+                  key={columnIndex}
+                  onClick={clickSquare}
+                >
+                  <p className={styles[stone]} data-stone={stone}></p>
+                </li>
+              )
+            }
+          )}
+        </ul>
+      </li>
+    )
+  })
+}
+の形でsquaresの内容を変更して<p>のclassNameが変わるようにして再現したい。
+
+
 
 ----------------------
+
+Reactで同様の動作を再現するには、状態管理とCSSのクラスの動的追加を組み合わせる必要があります。以下のようなコード例を作成しました。このコードは、アニメーションや配置ロジックをReactに適応させています。
+
+完成例
+tsx
+コードをコピーする
+import React, { useState } from "react";
+import styles from "./Board.module.css"; // CSSモジュールをインポート
+
+// 初期状態の8x8マス
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "white", "black", "none", "none", "none"],
+  ["none", "none", "none", "black", "white", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+];
+
+const Board = () => {
+  const [squares, setSquares] = useState<string[][]>(SQUARES);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentStone, setCurrentStone] = useState<"black" | "white">("black");
+
+  const clickSquare = (rowIndex: number, columnIndex: number) => {
+    if (isAnimating) return; // アニメーション中は無効
+
+    const newSquares = squares.map((row, rIndex) =>
+      row.map((stone, cIndex) => {
+        if (rIndex === rowIndex && cIndex === columnIndex && stone === "none") {
+          return currentStone;
+        }
+        return stone;
+      })
+    );
+
+    setSquares(newSquares); // 状態を更新
+    setIsAnimating(true);
+
+    // アニメーションが終了した後に処理
+    setTimeout(() => {
+      setIsAnimating(false); // アニメーション終了を設定
+      setCurrentStone(currentStone === "black" ? "white" : "black"); // 次の石を切り替え
+    }, 300); // アニメーション時間と同じ
+  };
+
+  return (
+    <ul className={styles.board}>
+      {squares.map((row, rowIndex) => (
+        <li className={styles.row} key={rowIndex}>
+          <ul className={styles.column}>
+            {row.map((stone, columnIndex) => (
+              <li
+                className={styles.square}
+                role="button"
+                data-row={rowIndex}
+                data-column={columnIndex}
+                key={columnIndex}
+                onClick={() => clickSquare(rowIndex, columnIndex)}
+              >
+                <p
+                  className={`${styles[stone]} ${
+                    isAnimating && stone !== "none" ? styles.placing : ""
+                  }`}
+                  data-stone={stone}
+                ></p>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default Board;
+主なポイント
+状態管理:
+
+squares は現在の盤面を保持する。
+currentStone は現在置く石（黒か白）を管理する。
+isAnimating はアニメーション中の状態を管理し、処理を一時的に無効化する。
+アニメーション:
+
+<p> タグにアニメーション用のクラス placing を動的に追加。
+setTimeout を使用して、アニメーション終了後に状態を更新。
+動的クラス:
+
+クラス名は ${styles[stone]} ${isAnimating && stone !== "none" ? styles.placing : ""} のように動的に設定。
+CSSモジュールによってクラス名が自動的にユニーク化される。
+クリック処理:
+
+指定したマスが none の場合のみ動作し、それ以外では無視。
+次の石を black と white の間で切り替え。
+CSS (例)
+css
+コードをコピーする
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  display: flex;
+  gap: 4px;
+}
+
+.square {
+  width: 50px;
+  height: 50px;
+  background-color: #ccc;
+  position: relative;
+  cursor: pointer;
+}
+
+.none {
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  position: absolute;
+  z-index: 1;
+}
+
+.black {
+  background-color: #000;
+}
+
+.white {
+  background-color: #fff;
+}
+
+.placing {
+  animation: scaleUp 0.3s ease;
+}
+
+@keyframes scaleUp {
+  0% {
+    transform: scale(1.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+動作説明
+マスをクリックすると、そのマスの状態が none → black または white に変更され、配置アニメーションが実行されます。
+アニメーションが終了すると、次の石が設定されます。
+==========================
+stone.addEventListener('animationend', () => {
+のようなやり方はReactではつかえないのか？
+
+
+----------------------
+ReactでもaddEventListener('animationend', ...)のような方法を使用できますが、Reactの設計思想としては、DOM操作を直接行うのではなく、Reactのイベントハンドリング機能や状態管理を活用する方が推奨されています。
+
+とはいえ、animationendをReactで使用することは可能です。ReactではonAnimationEndという専用のプロパティが用意されており、これを使うことでアニメーション終了時のイベントを処理できます。
+
+Reactでのanimationendの実装例
+以下の例では、onAnimationEndを使用して、アニメーション終了後に特定の処理を実行します。
+
+tsx
+コードをコピーする
+import React, { useState } from "react";
+import styles from "./Board.module.css";
+
+const Board = () => {
+  const [squares, setSquares] = useState<string[][]>(
+    Array(8)
+      .fill(null)
+      .map(() => Array(8).fill("none"))
+  );
+  const [currentStone, setCurrentStone] = useState<"black" | "white">("black");
+
+  const handleSquareClick = (rowIndex: number, columnIndex: number) => {
+    // すでに石が置かれている場合は無視
+    if (squares[rowIndex][columnIndex] !== "none") return;
+
+    // マスの状態を更新
+    const newSquares = squares.map((row, rIdx) =>
+      row.map((stone, cIdx) =>
+        rIdx === rowIndex && cIdx === columnIndex ? currentStone : stone
+      )
+    );
+    setSquares(newSquares);
+  };
+
+  const handleAnimationEnd = (rowIndex: number, columnIndex: number) => {
+    // アニメーション終了後に次の石を切り替える
+    setCurrentStone((prev) => (prev === "black" ? "white" : "black"));
+  };
+
+  return (
+    <ul className={styles.board}>
+      {squares.map((row, rowIndex) => (
+        <li className={styles.row} key={rowIndex}>
+          <ul className={styles.column}>
+            {row.map((stone, columnIndex) => (
+              <li
+                className={styles.square}
+                key={columnIndex}
+                onClick={() => handleSquareClick(rowIndex, columnIndex)}
+              >
+                <p
+                  className={`${styles[stone]} ${
+                    stone !== "none" ? styles.placing : ""
+                  }`}
+                  onAnimationEnd={() => handleAnimationEnd(rowIndex, columnIndex)}
+                ></p>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default Board;
+主なポイント
+onAnimationEndの使用:
+
+addEventListener('animationend') の代わりに、Reactの onAnimationEnd を直接使用。
+Reactのイベントは仮想DOMを介して処理されるため、管理が簡潔になる。
+アニメーション終了時の処理:
+
+onAnimationEnd にコールバック関数を渡し、アニメーション終了後に次の石（黒または白）を設定する。
+状態管理:
+
+盤面 (squares) と現在の石 (currentStone) をReactのuseStateで管理。
+利点
+Reactらしい設計: DOM操作を直接行わず、Reactのイベントを使うことでコードが一貫性のある形になります。
+再レンダリングとの連携: 状態の変化による再レンダリングが簡単に行える。
+シンプルで安全: 仮想DOMによる管理のため、直接DOMを操作するよりも予期しないバグが減ります。
+必要ならuseRefと組み合わせたaddEventListenerも可能
+もしどうしてもaddEventListenerを使いたい場合は、useRefを活用して以下のように記述します。
+
+tsx
+コードをコピーする
+import React, { useRef, useEffect } from "react";
+
+const Board = () => {
+  const squareRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const element = squareRef.current;
+    if (element) {
+      const handleAnimationEnd = () => {
+        console.log("Animation ended");
+      };
+
+      element.addEventListener("animationend", handleAnimationEnd);
+
+      return () => {
+        element.removeEventListener("animationend", handleAnimationEnd);
+      };
+    }
+  }, []);
+
+  return (
+    <p ref={squareRef} className="placing"></p>
+  );
+};
+ただし、これはReactの設計思想に沿った方法ではないため、基本的にはonAnimationEndの使用をおすすめします。
+
+
+
+
+
+
+
+==========================
+アニメーションさせるために
+クリックしたら一時的に
+<p data-stone="black placing">
+のように表示させたく
+
+// マスの状態の配列（初期状態用）
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "white", "black", "none", "none", "none",],
+  ["none", "none", "none", "black", "white", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+]
+
+const [squares, setSquares] = useState<string[][]>(SQUARES)
+
+const changeSquares = useCallback((row: number, column: number) => {
+  setSquares((prevSquares) => {
+    const newSquares = [...prevSquares]
+    // newSquares[row][column] = isBlack ? 'black' : 'white'
+    newSquares[row][column] = `${isBlack ? 'black' : 'white'} placing`
+    // 省略
+    return newSquares
+  })
+}, [squares])
+
+
+// useCallbackを使うと再レンダリングされたときに再生成されない
+const clickSquare = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+  // <li> 要素を取得
+  const liElement = e.currentTarget
+  // <li> の data-row と data-column を取得
+  const row = Number(liElement.dataset.row)
+  const column = Number(liElement.dataset.column)
+  // <p> 要素を取得
+  const pElement = liElement.querySelector('p');
+  // <p> の className と data-stone を取得
+  const className = pElement?.className || 'unknown';
+  const stone = pElement?.dataset.stone || 'unknown';
+  // アニメーション中か、すでに石が置かれているマスをクリックしていたら終了
+  if((isAnimating) || (stone !== 'none')){
+    return
+  }
+  // 隣の石がひっくり返すことができそこに石を置くことができるか確認
+
+  // アニメーション中のフラグを立てる
+  setIsAnimating(true)
+  changeSquares(row, column)
+}, [squares]);
+
+としたのだが
+blackが
+Board-module__oL0KhG__black
+のようにならずに本当にただの
+<p data-stone="black placing">
+として出力されてしまった。
+
+classが２つあるように配列から読み込んで設定させるにはどうすればいいか？
+
+----------------------
+Reactで<p data-stone="black placing">のようなデータ属性を管理しつつ、classNameを正しく複数のクラスとして適用するには、次のように書くことができます。
+
+解決策
+複数のクラスを適用するためには、classNameに渡す文字列を組み立てる必要があります。Reactでは、クラス名の文字列を配列や条件式を使って柔軟に構築できます。
+
+以下に修正版コードを示します：
+
+修正版コード
+tsx
+コードをコピーする
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "white", "black", "none", "none", "none"],
+  ["none", "none", "none", "black", "white", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+];
+
+const [squares, setSquares] = useState<string[][]>(SQUARES);
+const [isAnimating, setIsAnimating] = useState(false);
+const [isBlack, setIsBlack] = useState(true);
+
+const changeSquares = useCallback(
+  (row: number, column: number) => {
+    setSquares((prevSquares) => {
+      const newSquares = prevSquares.map((r, rowIndex) =>
+        r.map((stone, colIndex) =>
+          rowIndex === row && colIndex === column
+            ? `${isBlack ? "black" : "white"} placing`
+            : stone
+        )
+      );
+      return newSquares;
+    });
+
+    // アニメーションが終わった後に状態を更新
+    setTimeout(() => {
+      setSquares((prevSquares) => {
+        const updatedSquares = prevSquares.map((r, rowIndex) =>
+          r.map((stone, colIndex) => {
+            if (rowIndex === row && colIndex === column) {
+              return isBlack ? "black" : "white"; // `placing`を除去
+            }
+            return stone;
+          })
+        );
+        setIsAnimating(false);
+        setIsBlack(!isBlack); // 次のターンの色に切り替え
+        return updatedSquares;
+      });
+    }, 300); // アニメーション時間と一致させる
+  },
+  [isBlack]
+);
+
+const clickSquare = useCallback(
+  (e: React.MouseEvent<HTMLLIElement>) => {
+    const liElement = e.currentTarget;
+    const row = Number(liElement.dataset.row);
+    const column = Number(liElement.dataset.column);
+
+    // 既に石が置かれている、またはアニメーション中なら何もしない
+    if (isAnimating || squares[row][column] !== "none") {
+      return;
+    }
+
+    setIsAnimating(true); // アニメーション中フラグを立てる
+    changeSquares(row, column);
+  },
+  [squares, isAnimating, changeSquares]
+);
+
+return (
+  <ul className="board">
+    {squares.map((row, rowIndex) => (
+      <li key={rowIndex} className="row">
+        <ul className="column">
+          {row.map((stone, columnIndex) => (
+            <li
+              key={columnIndex}
+              className="square"
+              data-row={rowIndex}
+              data-column={columnIndex}
+              onClick={clickSquare}
+            >
+              <p
+                className={`${stone
+                  .split(" ")
+                  .map((cls) => styles[cls])
+                  .join(" ")}`}
+                data-stone={stone}
+              ></p>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+);
+主なポイント
+classNameの構築:
+
+stone（例: "black placing"）をスペースで分割し、stylesオブジェクトから動的にクラスを適用。
+.join(" ")で最終的なクラス名を文字列として結合。
+setTimeoutでアニメーション終了後の処理:
+
+アニメーションの時間に合わせて、placingを取り除くための状態変更を行う。
+アニメーションが終了するタイミングでsetIsAnimating(false)も実行。
+isBlackの切り替え:
+
+アニメーション後に石の色を交互に切り替え。
+Reactの状態管理:
+
+状態（squares, isAnimating, isBlack）を適切に管理して、UIと同期する。
+結果の挙動
+ユーザーがマスをクリックすると、該当の<p>要素にblack placingやwhite placingが設定され、アニメーションが実行されます。
+アニメーション終了後にplacingが削除され、最終的にクラスがblackまたはwhiteだけになります。
+次のターンで石の色が交互に変わります。
+注意点
+アニメーション時間（0.3sなど）は、CSSとJavaScriptで一致させてください。
+このコードはコンポーネントスタイル（CSS Module）を使用していますが、classNameの構築方法は通常のCSSクラス名にも対応できます。
+この方法でReactらしく複数のクラスを適用できるはずです。
+
+
+==========================
+まずはsquares[0][0] の中身が"black placing"とスペースで分けてある場合に
+Next.jsがクラス名を補完しないのをどうにかしたいのだが、どうすればいいのか？
+setTimeoutはこの件では
+<p onAnimationEnd={() => handleAnimationEnd(rowIndex, columnIndex)}>
+のようにやるので考えない。
+
+----------------------
+Next.js が CSS モジュールのクラス名を補完しない理由は、直接文字列を渡す形（"black placing"のようなスペース区切りの文字列）では、CSS モジュールによるクラス名のマッピングが効かないからです。
+
+CSS モジュールでは、クラス名を補完するには以下の方法が必要です：
+
+解決策
+1. stylesを活用してクラスを動的に構築する
+CSS モジュールでクラス名を補完させるには、stylesオブジェクトを使って各クラス名を個別に解決し、最終的にスペースで結合する必要があります。
+
+例えば、"black placing"を動的に処理する方法は次のようになります：
+
+tsx
+コードをコピーする
+<p
+  className={stone
+    .split(" ") // スペースで分割して配列に
+    .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
+    .join(" ")} // 配列をスペースで結合してクラス名文字列を生成
+  data-stone={stone}
+>
+</p>
+これにより、styles["black"]やstyles["placing"]が解決され、適切なNext.jsの補完済みクラス名がclassNameに反映されます。
+
+2. clsxやclassnamesライブラリを使用する（推奨）
+より簡潔に書くには、クラス名の条件付けをサポートするライブラリを使うのがおすすめです。
+
+clsxを使う例（classnamesでも似たように書けます）：
+
+bash
+コードをコピーする
+npm install clsx
+tsx
+コードをコピーする
+import clsx from "clsx";
+
+<p
+  className={clsx(
+    stone.split(" ").map((cls) => styles[cls]) // クラス名をマッピングして結合
+  )}
+  data-stone={stone}
+>
+</p>
+clsxは、条件付きクラスの構築や配列形式のクラスを処理するのに便利で、可読性も向上します。
+
+3. スタイルを直接設定する方法（非推奨だがシンプル）
+styles[stone]のようにキーを直接設定できる場合は、次のように書けます。ただし、これはstoneが完全にCSSモジュールのキーとして一致する場合にのみ使用できます。
+
+tsx
+コードをコピーする
+<p
+  className={styles[stone]}
+  data-stone={stone}
+>
+</p>
+ただし、この方法では"black placing"のようにスペース区切りの文字列はサポートできません。
+
+最終コード例
+以下は、handleAnimationEndを含む構成でスペース区切りのクラス名を補完するコード例です：
+
+tsx
+コードをコピーする
+const Board = () => {
+  const [squares, setSquares] = useState<string[][]>([
+    ["black placing", "none", "none"],
+    ["none", "none", "none"],
+    ["none", "none", "none"],
+  ]);
+
+  const handleAnimationEnd = (row: number, col: number) => {
+    setSquares((prevSquares) =>
+      prevSquares.map((r, rowIndex) =>
+        r.map((stone, colIndex) => {
+          if (rowIndex === row && colIndex === col) {
+            return stone.replace(" placing", ""); // `placing`を削除
+          }
+          return stone;
+        })
+      )
+    );
+  };
+
+  return (
+    <ul className="board">
+      {squares.map((row, rowIndex) => (
+        <li key={rowIndex} className="row">
+          {row.map((stone, colIndex) => (
+            <p
+              key={colIndex}
+              className={stone
+                .split(" ")
+                .map((cls) => styles[cls])
+                .join(" ")}
+              data-stone={stone}
+              onAnimationEnd={() => handleAnimationEnd(rowIndex, colIndex)}
+            ></p>
+          ))}
+        </li>
+      ))}
+    </ul>
+  );
+};
+このコードでは、以下のことを実現しています：
+
+CSSモジュールの補完: styles[cls]でクラス名を適切にマッピング。
+placingの削除: アニメーション終了時にhandleAnimationEndでplacingを状態から取り除く。
+柔軟なクラス構築: クラス名の動的な構築をReactらしく実現。
+これでNext.jsでも動作するはずです。
+
+
+
+==========================
+
+----------------------
+
 
 ==========================
 
@@ -1791,6 +2529,7 @@ if (square) {
 ==========================
 
 ----------------------
+
 
 ==========================
 
