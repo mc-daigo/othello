@@ -1,0 +1,302 @@
+セレクターで白を選んだのに最初のクリックは一時的に黒になり、アニメーション後に白になる。
+その後はほかをクリックしても最初から白になる。
+黒に戻した場合も最初だけ白になる。
+
+一回目で変更しきれないのだが原因わかるか？
+
+
+----------------------------
+
+
+提供された状況から考えると、最初のクリック時に一時的に間違った値（黒）が設定される原因は、isBlack の状態の更新タイミングに問題がある可能性が高いです。Reactの状態更新は非同期であるため、状態が変更された直後にその状態を利用しようとすると、古い状態が使用されることがあります。
+
+状況の再確認
+問題の流れ
+
+セレクタで白を選ぶと isBlack が false になる。
+クリック時に changeSquares や他のロジックで isBlack の値を使っている。
+状態の更新が非同期のため、最初のクリック時には古い状態（黒）が使われる。
+その後正常に動作する理由
+
+状態が更新された後のクリックでは、正しい状態（白）が反映されている。
+解決方法
+状態更新後の値を即座に反映させたい場合、isBlack に直接依存するのではなく、セレクタの値をその場で参照する方法を使います。
+
+修正案
+changePlayer のイベントから直接値を使用し、現在の値をクリック時に参照する形に修正します。
+
+修正版コード
+tsx
+コードをコピーする
+const [isBlack, setIsBlack] = useState(true); // 現在の石の状態
+
+// セレクタ変更時の処理
+const changePlayer = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setIsBlack(e.target.value === 'black'); // 選択された値に応じて状態を更新
+};
+
+// クリック時の処理
+const clickSquare = (e: React.MouseEvent<HTMLLIElement>) => {
+  const liElement = e.currentTarget;
+  const row = Number(liElement.dataset.row);
+  const column = Number(liElement.dataset.column);
+
+  // 現在の値を直接参照
+  const stoneColor = isBlack ? 'black' : 'white';
+
+  setSquares((prevSquares) => {
+    const newSquares = [...prevSquares];
+    newSquares[row][column] = `${stoneColor} placing`; // 現在の値を設定
+    return newSquares;
+  });
+
+  // アニメーション終了時の処理
+  setTimeout(() => {
+    setSquares((prevSquares) => {
+      const newSquares = [...prevSquares];
+      newSquares[row][column] = stoneColor; // アニメーション後の状態を反映
+      return newSquares;
+    });
+  }, 300); // アニメーション時間に合わせる
+};
+修正ポイント
+クリック時に最新の値を取得
+
+isBlack の状態を参照し、stoneColor を決定しています。
+状態が非同期で更新されても、現在の値を直接使用するため問題が起きません。
+アニメーション終了後の更新
+
+setTimeout を使わず、onAnimationEnd を使うことも検討できますが、今回は簡略化のため時間を直接指定しています。
+状態管理の工夫
+もしも頻繁に状態管理が問題になる場合は、useReducer を利用して状態管理を統一する方法も効果的です。この方法では状態更新のタイミングを制御しやすくなります。
+
+========================
+const changePlayer = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  if(isBlack){
+    console.log('changePlayer前:black')
+  }
+  else{
+    console.log('changePlayer前:white')
+  }
+  console.log("e.target.valuer前：" + e.target.value)
+  setIsBlack(e.target.value === 'black'); // 選択された値に応じて状態を更新
+  if(isBlack){
+    console.log('changePlayer後:black')
+  }
+  else{
+    console.log('changePlayer後:white')
+  }
+  console.log("e.target.valuer後：" + e.target.value)
+}, [isBlack])
+
+で、blackからwhiteに変えたとき
+changePlayer前:black
+e.target.valuer前：white
+changePlayer後:black
+e.target.valuer後：white
+と表示された
+<selector>のvalueはwhiteに変わっているのだが
+
+setIsBlack(e.target.value === 'black'); 
+をやっても isBlack に値が変わっていないらしい。
+
+どうすればいい？
+
+------------------------
+
+Reactでは、setState を呼び出してもその直後に状態（isBlack）が同期的に更新されるわけではありません。setState は非同期に動作し、状態の更新は次のレンダリング時に反映されます。そのため、setIsBlack を呼び出した直後に isBlack を参照すると、まだ古い値が返されます。
+
+解決方法
+isBlack の最新値を使いたい場合、useEffect を利用して状態が更新されたタイミングで処理を行う方法が考えられます。
+
+修正版コード
+tsx
+コードをコピーする
+const changePlayer = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  if (isBlack) {
+    console.log("changePlayer前:black");
+  } else {
+    console.log("changePlayer前:white");
+  }
+  console.log("e.target.value前：" + e.target.value);
+
+  // 状態を更新
+  setIsBlack(e.target.value === 'black');
+
+  // この時点ではまだ isBlack は更新されていない
+  console.log("e.target.value後：" + e.target.value);
+}, []);
+
+// 状態変更を監視する useEffect
+useEffect(() => {
+  if (isBlack) {
+    console.log("isBlackが更新されました: black");
+  } else {
+    console.log("isBlackが更新されました: white");
+  }
+}, [isBlack]);
+修正ポイント
+setIsBlack の非同期性
+
+setIsBlack は即時反映されないため、状態更新後の処理は useEffect 内で実行します。
+useEffect を使って状態変更を検知
+
+isBlack の状態が更新されたタイミングでログを出力するようにしました。
+isBlack を参照する場合
+
+setIsBlack を呼び出した直後に isBlack を参照すると古い値が使用されます。最新の値を使いたい場合は、更新後のレンダリングを待つか、useEffect を利用します。
+動作確認の流れ
+セレクタを変更したときに setIsBlack が呼ばれる。
+isBlack の状態が非同期に更新される。
+状態が更新されたタイミングで useEffect がトリガーされ、最新の isBlack の値がログに出力される。
+これで問題が解消されるはずです！
+
+
+=================================
+
+changePlayerは isBlack の値を変えるだけでその中で isBlack を使いたいわけではない。
+changePlayerで isBlack を変更させた後に
+
+const changeSquares = useCallback((row: number, column: number) => {
+  setSquares((prevSquares) => {
+    const newSquares = [...prevSquares]
+  if(isBlack){
+    console.log('changeSquares：black')
+  }
+  else{
+    console.log('changeSquares：white')
+  }
+    // newSquares[row][column] = isBlack ? 'black' : 'white'
+    newSquares[row][column] = `${isBlack ? 'black' : 'white'} placing`
+    // 省略
+    return newSquares
+  })
+}, [squares])
+
+を実行しても isBlack が最初は変更されないのでこれをなんとかしたい。
+
+--------------------
+
+isBlack の最新値を使用したい場合、setState の非同期性を考慮してロジックを少し修正する必要があります。具体的には、changeSquares の中で直接 isBlack を参照するのではなく、setState に渡す関数内で最新の値を使う方法を採用するか、状態の更新後に確実に処理を行うようにします。
+
+解決策1: changeSquares の引数に現在の状態を渡す
+changeSquares を呼び出す際に、isBlack の現在の値を明示的に渡す方法です。
+
+修正版コード
+tsx
+コードをコピーする
+const changeSquares = useCallback((row: number, column: number, currentIsBlack: boolean) => {
+  setSquares((prevSquares) => {
+    const newSquares = [...prevSquares];
+    if (currentIsBlack) {
+      console.log("changeSquares：black");
+    } else {
+      console.log("changeSquares：white");
+    }
+    newSquares[row][column] = `${currentIsBlack ? 'black' : 'white'} placing`;
+    return newSquares;
+  });
+}, []);
+
+const clickSquare = useCallback(
+  (e: React.MouseEvent<HTMLLIElement>) => {
+    const liElement = e.currentTarget;
+    const row = Number(liElement.dataset.row);
+    const column = Number(liElement.dataset.column);
+
+    setIsAnimating(true); // アニメーション中のフラグを立てる
+    changeSquares(row, column, isBlack); // 最新の isBlack を渡す
+  },
+  [isBlack] // isBlack を依存配列に追加
+);
+解決策2: setState のコールバック関数を活用する
+setState のコールバック関数を使用して、最新の状態を安全に参照する方法です。
+
+修正版コード
+tsx
+コードをコピーする
+const clickSquare = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+  const liElement = e.currentTarget;
+  const row = Number(liElement.dataset.row);
+  const column = Number(liElement.dataset.column);
+
+  setIsAnimating(true); // アニメーション中のフラグを立てる
+
+  setIsBlack((prevIsBlack) => {
+    // 最新の isBlack を使用して状態を更新
+    changeSquares(row, column, prevIsBlack);
+    return prevIsBlack; // 状態の変更が必要ならここで更新
+  });
+}, []);
+解決策3: 状態更新後の副作用を useEffect で管理
+状態更新後に何らかの処理を実行する必要がある場合は、useEffect を使う方法も考えられます。ただし、この方法は状態に基づいて処理を自動でトリガーする場合に適しており、明示的に関数を呼び出すシナリオでは推奨されません。
+
+補足
+useCallback の依存配列に注意
+isBlack を参照している関数では、useCallback の依存配列に isBlack を追加してください。
+
+isBlack の直接参照を避ける
+状態更新後の最新値を使いたい場合は、必ず setState のコールバック関数か、関数の引数で明示的に値を渡すようにしてください。
+
+解決策1か2を採用することで、isBlack の最新値を正しく処理できるようになります！
+
+================
+
+解決策1: は isBlack を clickSquare内で直接読むのではなく clickSquareに引数として渡せばいいのか？
+clickSquare が直接 isBlack を読んでも最新ではないが引数として渡せば最新になっているのか？
+
+そもそも引数が最新になっている保証はあるのか？
+
+
+------------------------------
+
+
+引数として渡された値が 最新である保証 については、その値を渡すタイミングに依存します。clickSquare に引数を渡すとき、その引数の値はその瞬間の状態を表します。そのため、渡すタイミング次第で、isBlack の 最新値 を明示的に管理できます。
+
+重要なポイント
+React の状態（isBlack）は非同期で更新される
+setIsBlack を呼び出した直後に isBlack を参照しても、その値はまだ更新されていないことがあります。React が状態をバッチ的に処理するためです。
+
+引数に値を渡す場合は、呼び出し時点の状態を反映する
+その関数の外部（親コンポーネントや呼び出し元）で管理されている状態を引数に渡す場合、渡された値は呼び出し元の時点の状態となります。これにより、呼び出し元で管理している最新の値を使うことができます。
+
+引数として渡す場合の例
+修正版コード
+tsx
+コードをコピーする
+const clickSquare = useCallback(
+  (e: React.MouseEvent<HTMLLIElement>, currentIsBlack: boolean) => {
+    const liElement = e.currentTarget;
+    const row = Number(liElement.dataset.row);
+    const column = Number(liElement.dataset.column);
+
+    setIsAnimating(true); // アニメーション中のフラグを立てる
+    changeSquares(row, column, currentIsBlack); // 最新の isBlack を引数で渡す
+  },
+  [] // `isBlack` は依存配列に入れない
+);
+呼び出し元での引数管理
+tsx
+コードをコピーする
+const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
+  clickSquare(e, isBlack); // 呼び出し時点の isBlack を渡す
+};
+なぜ引数で渡すと最新になるのか？
+React の状態管理において、useState で取得した isBlack は 関数が呼び出されたタイミング の値を保持します。したがって、clickSquare の引数に渡した場合、その値は呼び出し時点の isBlack を反映しています。
+
+引数が最新である保証はあるのか？
+引数の値が最新であるかどうかは、関数を呼び出した時点の状態 に依存します。
+呼び出し時点で正しい状態を渡していれば、その引数は最新値として扱えます。
+
+isBlack の更新が非同期で行われるため、setIsBlack を呼び出した直後に isBlack を参照しても新しい値は得られません。しかし、引数に渡す方法では、呼び出し元の時点での状態を明示的に渡すため、この問題を回避できます。
+
+注意点
+引数に渡す方法を採用する場合、clickSquare がどのタイミングで呼び出されるかを慎重に管理する必要があります。もし isBlack をどの時点でも最新として扱いたい場合、以下の方法を組み合わせるのがおすすめです。
+
+引数として渡すことで明示的に値を管理する
+呼び出し元の責任で最新値を渡す。
+
+状態更新のコールバック関数を使用する
+setState((prev) => { ... }) を利用して確実に最新の状態を反映する。
+
+これらを組み合わせることで、状態の非同期更新による問題を防ぐことができます。

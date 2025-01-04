@@ -33,7 +33,9 @@
   cursor: pointer;
   position: relative;
 }
-
+.none{
+  background: transparent;
+}
 .black,
 .white{
   width: 85%;
@@ -232,7 +234,8 @@
 .selectStone,
 .whiteButton,
 .blackButton,
-.changeButton{
+.changeButton,
+.countButton{
   background-color: #fff;
   border: #333 solid 1px;
 }
