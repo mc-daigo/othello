@@ -9,7 +9,7 @@ export const Board = () => {
   if (!context) {
     throw new Error("GlobalValueContext must be used within GlobalValueProvider");
   }
-  const {isBlack, changePlayer, countUp, squares, clickSquare, handleAnimationEnd} = context
+  const {isBlack, changePlayer, countUp, squares, clickSquare, isAnimating, handleAnimationEnd} = context
 
   return (
     <div className={styles.board}>
@@ -336,7 +336,13 @@ export const Board = () => {
           <option value="6">7</option>
           <option value="7">8</option>
         </select>
-        <select name="stone" className={styles.selectStone} onChange={changePlayer}>
+        <select
+          name="stone"
+          className={styles.selectStone}
+          onChange={changePlayer}
+          disabled={isAnimating}
+          value={isBlack ? 'black' : 'white'} // isBlack にバインド
+        >
           <option value="black">黒</option>
           <option value="white">白</option>
         </select>

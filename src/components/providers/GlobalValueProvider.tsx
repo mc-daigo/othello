@@ -11,6 +11,7 @@ type GlobalValueContextType = {
   countUp: () => void,
   squares: string[][],
   clickSquare: (e: React.MouseEvent<HTMLLIElement>) => void,
+  isAnimating :boolean,
   handleAnimationEnd: (row: number, column: number) => void,
 } | null;
 // type GlobalValueContextType = {
@@ -86,11 +87,15 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
       // 新しい配列の変更のあったマス目の黒か白かを変更する（クラスplacingが消える）
       newSquares[row][column] = isBlack ? 'black' : 'white'
       // 現在のプレイヤーを入れ替える
-      setIsBlack((prevIsBlack) => !prevIsBlack)
+      // setIsBlack((prevIsBlack) => !prevIsBlack)
       // 新しい配列をstateに返す
       return newSquares
     })
-  },[squares])
+      // 現在のプレイヤーを入れ替え、セレクターの値を連動して更新
+    setIsBlack((prevIsBlack) => !prevIsBlack);
+    // カウントアップする
+    countUp()
+  },[isBlack, squares])
   
   // マス目の状態を変更する関数 クリックされたときに呼び出す（isBlackをここで直接取得すると同期されていない可能性があるので引数で取得する）
   const changeSquares = useCallback((row: number, column: number, innerIsBlack: boolean) => {
@@ -176,7 +181,7 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <GlobalValueContext.Provider value={{ isBlack, changePlayer, turn, countUp, squares, clickSquare, handleAnimationEnd}}>
+    <GlobalValueContext.Provider value={{ isBlack, changePlayer, turn, countUp, squares, clickSquare, isAnimating, handleAnimationEnd}}>
       {children}
     </GlobalValueContext.Provider>
   );
