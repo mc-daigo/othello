@@ -546,3 +546,123 @@ DOM 要素への参照が必要な場合（例：フォーカス制御）。
 7. 結論
 useRef は「再レンダリングされない」参照として便利です。
 DOM 要素へのアクセスや一時的な値の保持に最適ですが、UI の状態管理には useState を使うべきです。
+
+
+===========================
+
+clickSquare 内の
+const pElement = liElement.querySelector('p');
+などは
+
+これは原則的に DOM 操作を直接行う方法で、React の設計思想に反します。
+
+には当たらないのか？
+
+------------------
+
+はい、React の設計思想では「DOM を直接操作するのではなく、React の仮想 DOM（Virtual DOM）を通じて状態を管理し、UI を更新する」ことが推奨されています。そのため、querySelector のように DOM を直接操作する方法は、React の設計思想に反する場合が多いです。
+
+1. なぜ querySelector を使うと設計思想に反するのか？
+React の状態管理を無視する
+
+React では状態（state）やプロパティ（props）を使ってコンポーネントの描画を管理します。
+querySelector を使うと、React のライフサイクルや再描画フローを無視して、DOM を直接操作することになります。
+データの一貫性が失われる可能性
+
+React の状態と DOM の状態が同期していない場合、意図しない動作やバグの原因になります。
+例えば、状態は黒 (isBlack) なのに、DOM に白のクラスが直接操作で設定されている場合、一貫性が崩れます。
+再レンダリングで影響が失われる
+
+DOM を直接操作しても、React が再レンダリングを行うと、その操作の結果が失われる可能性があります。
+2. 例外的に DOM を操作する場面
+querySelector や ref を使った DOM 操作が適切な場合もありますが、それは以下のような特定の場面に限られます：
+
+React で直接サポートされていない操作
+
+フォーカス制御（例：input.focus()）。
+サードパーティライブラリが DOM 操作を前提としている場合。
+パフォーマンスが重要な場合
+
+状態管理での更新が高コストで、簡易的な DOM 操作で済ませたい場合。
+3. 改善案：querySelector を使わない実装
+React の状態と props を活用して、直接 DOM 操作を避ける方法を考えます。
+
+現在のコード例
+tsx
+コードをコピーする
+const clickSquare = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+  const liElement = e.currentTarget;
+  const pElement = liElement.querySelector('p');
+  const stone = pElement?.dataset.stone || 'unknown';
+
+  if (stone !== 'none') return;
+  // 他の処理
+}, []);
+改善案：props を使ってデータを渡す
+pElement を取得する代わりに、必要なデータを親コンポーネントから props として渡します。
+
+tsx
+コードをコピーする
+function Square({
+  stone,
+  onClick,
+}: {
+  stone: string;
+  onClick: () => void;
+}) {
+  return (
+    <li role="button" onClick={onClick}>
+      <p data-stone={stone} className={`stone ${stone}`}></p>
+    </li>
+  );
+}
+
+// 親コンポーネントで使用
+squares.map((row, rowIndex) =>
+  row.map((stone, columnIndex) => (
+    <Square
+      key={`${rowIndex}-${columnIndex}`}
+      stone={stone}
+      onClick={() => handleClick(rowIndex, columnIndex)}
+    />
+  ))
+);
+ポイント:
+stone のデータは状態 (state) に保存して管理します。
+子コンポーネント（Square）では、props を使って stone の情報を受け取ります。
+クリックイベントは親コンポーネントで処理します。
+4. 必要に応じて ref を使う
+どうしても querySelector を使いたい場合は、React の ref を活用してコンポーネント内で制御する方法が推奨されます。
+
+tsx
+コードをコピーする
+function SquareWithRef({ stone }: { stone: string }) {
+  const pRef = useRef<HTMLParagraphElement>(null);
+
+  const handleClick = () => {
+    if (pRef.current) {
+      console.log(pRef.current.dataset.stone); // 安全にアクセス
+    }
+  };
+
+  return (
+    <li role="button" onClick={handleClick}>
+      <p ref={pRef} data-stone={stone} className={`stone ${stone}`}></p>
+    </li>
+  );
+}
+5. 結論
+React では、できるだけ状態管理 (state) と props を活用して、DOM 操作を直接行うことを避けるべきです。
+どうしても DOM 操作が必要な場合には、useRef を使用し、直接 DOM を操作する部分を最小限に抑えるべきです。
+
+
+
+
+
+
+
+
+
+
+
+
