@@ -10,7 +10,9 @@ type GlobalValueContextType = {
   turn: number,
   countUp: () => void,
   squares: string[][],
-  clickSquare: (e: React.MouseEvent<HTMLLIElement>) => void,
+  // clickSquare: (e: React.MouseEvent<HTMLLIElement>) => void,
+  clickSquare: (row: number, column: number, stone: string) => void,
+  isAnimating :boolean,
   handleAnimationEnd: (row: number, column: number) => void,
 } | null;
 // type GlobalValueContextType = {
@@ -85,12 +87,14 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
       const newSquares = [...prevSquares]
       // 新しい配列の変更のあったマス目の黒か白かを変更する（クラスplacingが消える）
       newSquares[row][column] = isBlack ? 'black' : 'white'
-      // 現在のプレイヤーを入れ替える
-      setIsBlack((prevIsBlack) => !prevIsBlack)
       // 新しい配列をstateに返す
       return newSquares
     })
-  },[squares])
+      // 現在のプレイヤーを入れ替え、セレクターの値を連動して更新
+    setIsBlack((prevIsBlack) => !prevIsBlack);
+    // カウントアップする
+    countUp()
+  },[isBlack, squares])
   
   // マス目の状態を変更する関数 クリックされたときに呼び出す（isBlackをここで直接取得すると同期されていない可能性があるので引数で取得する）
   const changeSquares = useCallback((row: number, column: number, innerIsBlack: boolean) => {
@@ -117,24 +121,14 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
 
   // useCallbackを使うと再レンダリングされたときに再生成されない
   // マスをクリックしたときに呼び出される関数
-  const clickSquare = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+  const clickSquare = useCallback((row: number, column: number, stone: string) => {
     // if(isBlack){
     //   console.log('clickSquare前:black')
     // }
     // else{
     //   console.log('clickSquare前:white')
     // }
-    // <li> 要素を取得
-    const liElement = e.currentTarget
-    // <li> の data-row と data-column を取得
-    const row = Number(liElement.dataset.row)
-    const column = Number(liElement.dataset.column)
-    // <p> 要素を取得
-    const pElement = liElement.querySelector('p');
-    // <p> の className と data-stone を取得
-    // <p> 要素が見つからない場合に備え、?.（オプショナルチェーン）で安全にアクセスしています。
-    const className = pElement?.className || 'unknown';
-    const stone = pElement?.dataset.stone || 'unknown';
+
     // アニメーション中か、すでに石が置かれているマスをクリックしていたら終了
     if((isAnimating) || (stone !== 'none')){
       return
@@ -152,11 +146,47 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
     });
 
 
-    console.log('Row:', row);
-    console.log('Column:', column);
-    console.log('ClassName:', className);
-    console.log('Data-stone:', stone);
-  }, [squares]);
+    // console.log('Row:', row);
+    // console.log('Column:', column);
+    // console.log('ClassName:', className);
+    // console.log('Data-stone:', stone);
+  }, [isAnimating, changeSquares]);
+
+
+  // // マスをクリックしたときに呼び出される関数
+  // const clickSquare = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+  //   const liElement = e.currentTarget
+  //   // <li> の data-row と data-column を取得
+  //   const row = Number(liElement.dataset.row)
+  //   const column = Number(liElement.dataset.column)
+  //   // <p> 要素を取得
+  //   const pElement = liElement.querySelector('p');
+  //   // <p> の className と data-stone を取得
+  //   // <p> 要素が見つからない場合に備え、?.（オプショナルチェーン）で安全にアクセスしています。
+  //   const className = pElement?.className || 'unknown';
+  //   const stone = pElement?.dataset.stone || 'unknown';
+  //   // アニメーション中か、すでに石が置かれているマスをクリックしていたら終了
+  //   if((isAnimating) || (stone !== 'none')){
+  //     return
+  //   }
+  //   // 隣の石がひっくり返すことができそこに石を置くことができるか確認
+
+  //   // アニメーション中でなければアニメーション中のフラグを立てる
+  //   setIsAnimating(true)
+
+  //   // setState のコールバック関数を使用して、最新の状態を安全に参照する方法
+  //   setIsBlack((prevIsBlack) => {
+  //     // 最新の isBlack を使用して状態を更新
+  //     changeSquares(row, column, prevIsBlack)
+  //     return prevIsBlack; // 状態の変更が必要ならここで更新
+  //   });
+
+
+  //   console.log('Row:', row);
+  //   console.log('Column:', column);
+  //   console.log('ClassName:', className);
+  //   console.log('Data-stone:', stone);
+  // }, [squares]);
 
 
 
@@ -176,7 +206,7 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <GlobalValueContext.Provider value={{ isBlack, changePlayer, turn, countUp, squares, clickSquare, handleAnimationEnd}}>
+    <GlobalValueContext.Provider value={{ isBlack, changePlayer, turn, countUp, squares, clickSquare, isAnimating, handleAnimationEnd}}>
       {children}
     </GlobalValueContext.Provider>
   );

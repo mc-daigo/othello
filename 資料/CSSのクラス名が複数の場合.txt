@@ -1,0 +1,585 @@
+アニメーションさせるために
+クリックしたら一時的に
+<p data-stone="black placing">   注：多分 className の書き間違い
+のように表示させたく
+
+// マスの状態の配列（初期状態用）
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "white", "black", "none", "none", "none",],
+  ["none", "none", "none", "black", "white", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+  ["none", "none", "none", "none", "none", "none", "none", "none",],
+]
+
+const [squares, setSquares] = useState<string[][]>(SQUARES)
+
+const changeSquares = useCallback((row: number, column: number) => {
+  setSquares((prevSquares) => {
+    const newSquares = [...prevSquares]
+    // newSquares[row][column] = isBlack ? 'black' : 'white'
+    newSquares[row][column] = `${isBlack ? 'black' : 'white'} placing`
+    // 省略
+    return newSquares
+  })
+}, [squares])
+
+
+// useCallbackを使うと再レンダリングされたときに再生成されない
+const clickSquare = useCallback((e: React.MouseEvent<HTMLLIElement>) => {
+  // <li> 要素を取得
+  const liElement = e.currentTarget
+  // <li> の data-row と data-column を取得
+  const row = Number(liElement.dataset.row)
+  const column = Number(liElement.dataset.column)
+  // <p> 要素を取得
+  const pElement = liElement.querySelector('p');
+  // <p> の className と data-stone を取得
+  const className = pElement?.className || 'unknown';
+  const stone = pElement?.dataset.stone || 'unknown';
+  // アニメーション中か、すでに石が置かれているマスをクリックしていたら終了
+  if((isAnimating) || (stone !== 'none')){
+    return
+  }
+  // 隣の石がひっくり返すことができそこに石を置くことができるか確認
+
+  // アニメーション中のフラグを立てる
+  setIsAnimating(true)
+  changeSquares(row, column)
+}, [squares]);
+
+としたのだが
+blackが
+Board-module__oL0KhG__black
+のようにならずに本当にただの
+<p data-stone="black placing">
+として出力されてしまった。
+
+classが２つあるように配列から読み込んで設定させるにはどうすればいいか？
+
+----------------------
+Reactで<p data-stone="black placing">のようなデータ属性を管理しつつ、classNameを正しく複数のクラスとして適用するには、次のように書くことができます。
+
+解決策
+複数のクラスを適用するためには、classNameに渡す文字列を組み立てる必要があります。Reactでは、クラス名の文字列を配列や条件式を使って柔軟に構築できます。
+
+以下に修正版コードを示します：
+
+修正版コード
+tsx
+コードをコピーする
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "white", "black", "none", "none", "none"],
+  ["none", "none", "none", "black", "white", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+];
+
+const [squares, setSquares] = useState<string[][]>(SQUARES);
+const [isAnimating, setIsAnimating] = useState(false);
+const [isBlack, setIsBlack] = useState(true);
+
+const changeSquares = useCallback(
+  (row: number, column: number) => {
+    setSquares((prevSquares) => {
+      const newSquares = prevSquares.map((r, rowIndex) =>
+        r.map((stone, colIndex) =>
+          rowIndex === row && colIndex === column
+            ? `${isBlack ? "black" : "white"} placing`
+            : stone
+        )
+      );
+      return newSquares;
+    });
+
+    // アニメーションが終わった後に状態を更新
+    setTimeout(() => {
+      setSquares((prevSquares) => {
+        const updatedSquares = prevSquares.map((r, rowIndex) =>
+          r.map((stone, colIndex) => {
+            if (rowIndex === row && colIndex === column) {
+              return isBlack ? "black" : "white"; // `placing`を除去
+            }
+            return stone;
+          })
+        );
+        setIsAnimating(false);
+        setIsBlack(!isBlack); // 次のターンの色に切り替え
+        return updatedSquares;
+      });
+    }, 300); // アニメーション時間と一致させる
+  },
+  [isBlack]
+);
+
+const clickSquare = useCallback(
+  (e: React.MouseEvent<HTMLLIElement>) => {
+    const liElement = e.currentTarget;
+    const row = Number(liElement.dataset.row);
+    const column = Number(liElement.dataset.column);
+
+    // 既に石が置かれている、またはアニメーション中なら何もしない
+    if (isAnimating || squares[row][column] !== "none") {
+      return;
+    }
+
+    setIsAnimating(true); // アニメーション中フラグを立てる
+    changeSquares(row, column);
+  },
+  [squares, isAnimating, changeSquares]
+);
+
+return (
+  <ul className="board">
+    {squares.map((row, rowIndex) => (
+      <li key={rowIndex} className="row">
+        <ul className="column">
+          {row.map((stone, columnIndex) => (
+            <li
+              key={columnIndex}
+              className="square"
+              data-row={rowIndex}
+              data-column={columnIndex}
+              onClick={clickSquare}
+            >
+              <p
+                className={`${stone
+                  .split(" ")
+                  .map((cls) => styles[cls])
+                  .join(" ")}`}
+                data-stone={stone}
+              ></p>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+);
+主なポイント
+classNameの構築:
+
+stone（例: "black placing"）をスペースで分割し、stylesオブジェクトから動的にクラスを適用。
+.join(" ")で最終的なクラス名を文字列として結合。
+setTimeoutでアニメーション終了後の処理:
+
+アニメーションの時間に合わせて、placingを取り除くための状態変更を行う。
+アニメーションが終了するタイミングでsetIsAnimating(false)も実行。
+isBlackの切り替え:
+
+アニメーション後に石の色を交互に切り替え。
+Reactの状態管理:
+
+状態（squares, isAnimating, isBlack）を適切に管理して、UIと同期する。
+結果の挙動
+ユーザーがマスをクリックすると、該当の<p>要素にblack placingやwhite placingが設定され、アニメーションが実行されます。
+アニメーション終了後にplacingが削除され、最終的にクラスがblackまたはwhiteだけになります。
+次のターンで石の色が交互に変わります。
+注意点
+アニメーション時間（0.3sなど）は、CSSとJavaScriptで一致させてください。
+このコードはコンポーネントスタイル（CSS Module）を使用していますが、classNameの構築方法は通常のCSSクラス名にも対応できます。
+この方法でReactらしく複数のクラスを適用できるはずです。
+
+
+==========================
+まずはsquares[0][0] の中身が"black placing"とスペースで分けてある場合に
+Next.jsがクラス名を補完しないのをどうにかしたいのだが、どうすればいいのか？
+setTimeoutはこの件では
+<p onAnimationEnd={() => handleAnimationEnd(rowIndex, columnIndex)}>
+のようにやるので考えない。
+
+----------------------
+Next.js が CSS モジュールのクラス名を補完しない理由は、直接文字列を渡す形（"black placing"のようなスペース区切りの文字列）では、CSS モジュールによるクラス名のマッピングが効かないからです。
+
+CSS モジュールでは、クラス名を補完するには以下の方法が必要です：
+
+解決策
+1. stylesを活用してクラスを動的に構築する
+CSS モジュールでクラス名を補完させるには、stylesオブジェクトを使って各クラス名を個別に解決し、最終的にスペースで結合する必要があります。
+
+例えば、"black placing"を動的に処理する方法は次のようになります：
+
+tsx
+コードをコピーする
+<p
+  className={stone
+    .split(" ") // スペースで分割して配列に
+    .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
+    .join(" ")} // 配列をスペースで結合してクラス名文字列を生成
+  data-stone={stone}
+>
+</p>
+これにより、styles["black"]やstyles["placing"]が解決され、適切なNext.jsの補完済みクラス名がclassNameに反映されます。
+
+2. clsxやclassnamesライブラリを使用する（推奨）
+より簡潔に書くには、クラス名の条件付けをサポートするライブラリを使うのがおすすめです。
+
+clsxを使う例（classnamesでも似たように書けます）：
+
+bash
+コードをコピーする
+npm install clsx
+tsx
+コードをコピーする
+import clsx from "clsx";
+
+<p
+  className={clsx(
+    stone.split(" ").map((cls) => styles[cls]) // クラス名をマッピングして結合
+  )}
+  data-stone={stone}
+>
+</p>
+clsxは、条件付きクラスの構築や配列形式のクラスを処理するのに便利で、可読性も向上します。
+
+3. スタイルを直接設定する方法（非推奨だがシンプル）
+styles[stone]のようにキーを直接設定できる場合は、次のように書けます。ただし、これはstoneが完全にCSSモジュールのキーとして一致する場合にのみ使用できます。
+
+tsx
+コードをコピーする
+<p
+  className={styles[stone]}
+  data-stone={stone}
+>
+</p>
+ただし、この方法では"black placing"のようにスペース区切りの文字列はサポートできません。
+
+最終コード例
+以下は、handleAnimationEndを含む構成でスペース区切りのクラス名を補完するコード例です：
+
+tsx
+コードをコピーする
+const Board = () => {
+  const [squares, setSquares] = useState<string[][]>([
+    ["black placing", "none", "none"],
+    ["none", "none", "none"],
+    ["none", "none", "none"],
+  ]);
+
+  const handleAnimationEnd = (row: number, col: number) => {
+    setSquares((prevSquares) =>
+      prevSquares.map((r, rowIndex) =>
+        r.map((stone, colIndex) => {
+          if (rowIndex === row && colIndex === col) {
+            return stone.replace(" placing", ""); // `placing`を削除
+          }
+          return stone;
+        })
+      )
+    );
+  };
+
+  return (
+    <ul className="board">
+      {squares.map((row, rowIndex) => (
+        <li key={rowIndex} className="row">
+          {row.map((stone, colIndex) => (
+            <p
+              key={colIndex}
+              className={stone
+                .split(" ")
+                .map((cls) => styles[cls])
+                .join(" ")}
+              data-stone={stone}
+              onAnimationEnd={() => handleAnimationEnd(rowIndex, colIndex)}
+            ></p>
+          ))}
+        </li>
+      ))}
+    </ul>
+  );
+};
+このコードでは、以下のことを実現しています：
+
+CSSモジュールの補完: styles[cls]でクラス名を適切にマッピング。
+placingの削除: アニメーション終了時にhandleAnimationEndでplacingを状態から取り除く。
+柔軟なクラス構築: クラス名の動的な構築をReactらしく実現。
+これでNext.jsでも動作するはずです。
+
+
+===============================
+TypeScriptとNext.jsを使ったReactでオセロのアプリを作るソースで
+
+const SQUARES: string[][] = [
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "white", "black", "none", "none", "none"],
+  ["none", "none", "none", "black", "white", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+  ["none", "none", "none", "none", "none", "none", "none", "none"],
+];
+
+const [squares, setSquares] = useState<string[][]>(SQUARES);
+
+return (
+  <ul className="board">
+    {squares.map((row, rowIndex) => (
+      <li key={rowIndex} className="row">
+        <ul className="column">
+          {row.map((stone, columnIndex) => (
+            <li
+              key={columnIndex}
+              className="square"
+              data-row={rowIndex}
+              data-column={columnIndex}
+              onClick={clickSquare}
+            >
+              <p
+                className={`${stone
+                  .split(" ")
+                  .map((cls) => styles[cls])
+                  .join(" ")}`}
+                data-stone={stone}
+              ></p>
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ul>
+);
+
+で例えばsquaresの値の一つが "black placing" というクラス名２つの場合に対応するソースを教えてもらった。
+
+<p
+  className={stone
+    .split(" ") // スペースで分割して配列に
+    .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
+    .join(" ")} // 配列をスペースで結合してクラス名文字列を生成
+  data-stone={stone}
+>
+</p>
+となっていて、例えば "black placing"の場合
+split(" ")で"black" "placing"の配列になるのはわかるが
+.map((cls) => styles[cls])
+と
+.join(" ")
+でどのようにstoneの値が変化するのか順を追って説明してほしい。
+
+--------------
+
+stone の値が "black placing" の場合、以下のコードがどのように動作するのか順を追って説明します。
+
+tsx
+コードをコピーする
+<p
+  className={stone
+    .split(" ") // スペースで分割して配列に
+    .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
+    .join(" ")} // 配列をスペースで結合してクラス名文字列を生成
+  data-stone={stone}
+>
+</p>
+コードの流れと stone の変化
+初期値 (stone の値)
+stone = "black placing"
+1. split(" ")
+動作:
+
+split(" ") は、文字列をスペース（" "）で区切り、配列に変換します。
+"black placing" を " " で分割すると、以下の配列が生成されます。
+結果:
+
+tsx
+コードをコピーする
+["black", "placing"]
+2. map((cls) => styles[cls])
+動作:
+
+配列の各要素（ここでは "black" と "placing"）に対して関数を実行し、新しい配列を生成します。
+styles[cls] は、cls をキーとして styles オブジェクトから対応するクラス名を取得します。
+ここでの styles は、CSS モジュールをインポートしたオブジェクトを指しています。
+例:
+
+tsx
+コードをコピーする
+const styles = {
+  black: "black_123abc",   // CSS モジュールの黒のクラス名
+  placing: "placing_456def", // CSS モジュールの配置中のクラス名
+};
+"black" の場合:
+styles["black"] は "black_123abc" を返します。
+"placing" の場合:
+styles["placing"] は "placing_456def" を返します。
+結果:
+
+tsx
+コードをコピーする
+["black_123abc", "placing_456def"]
+3. join(" ")
+動作:
+
+配列の要素を " "（スペース）で結合して、1つの文字列にします。
+配列 ["black_123abc", "placing_456def"] をスペースで結合すると、以下のようになります。
+結果:
+
+tsx
+コードをコピーする
+"black_123abc placing_456def"
+最終的な className の値
+最終的に、<p> タグの className 属性には以下の値が設定されます。
+
+tsx
+コードをコピーする
+className="black_123abc placing_456def"
+コード全体の流れのまとめ
+stone の初期値: "black placing"
+split(" "): 配列 ["black", "placing"] に変換。
+map((cls) => styles[cls]): 配列の各要素を CSS モジュールのクラス名に置き換える → ["black_123abc", "placing_456def"]。
+join(" "): 配列をスペースで結合 → "black_123abc placing_456def"。
+注意点
+styles は通常、CSS モジュールをインポートしたオブジェクトで、キーが CSS クラス名、値がユニークなクラス名文字列です。
+この手法は CSS モジュールを使用している場合にのみ動作します。
+stone の値が styles オブジェクトに存在しない場合、undefined を返すため、意図しないクラス名が含まれる可能性があります。必要に応じてエラーハンドリングを追加することが推奨されます。
+
+================================================
+
+const styles = {
+  black: "black_123abc",   // CSS モジュールの黒のクラス名
+  placing: "placing_456def", // CSS モジュールの配置中のクラス名
+};
+
+で取得するのはこちらが用意した 〇〇.module.css からNext.jsが自動で作成した配列ということか？
+
+
+----------------------
+
+
+はい、その通りです！styles オブジェクトは、Next.js が CSS モジュール をインポートした際に自動生成されるものです。
+
+CSS モジュールの仕組み
+CSS モジュールファイルを作成
+例えば、styles.module.css というファイルに以下のようなスタイルを定義するとします。
+
+css
+コードをコピーする
+/* styles.module.css */
+.black {
+  background-color: black;
+}
+
+.placing {
+  animation: fadeIn 0.5s ease-in-out;
+}
+Next.js による処理
+この .module.css ファイルを React コンポーネントでインポートすると、Next.js はクラス名をユニークな形式に変換して styles オブジェクトを作成します。
+
+tsx
+コードをコピーする
+import styles from './styles.module.css';
+このインポートによって、styles オブジェクトが自動的に生成されます。
+
+生成されるオブジェクトの例:
+
+javascript
+コードをコピーする
+const styles = {
+  black: "black_123abc",   // ユニークなクラス名
+  placing: "placing_456def", // ユニークなクラス名
+};
+元のクラス名（例: .black, .placing）をキーとして持ち、
+Next.js が生成したユニークなクラス名（例: black_123abc, placing_456def）を値として持つオブジェクトです。
+className に利用
+styles.black や styles.placing を React の className 属性に渡すことで、Next.js が自動生成したユニークなクラス名を要素に適用します。
+
+tsx
+コードをコピーする
+<p className={styles.black}>Black Stone</p>
+これにより、HTML は次のようにレンダリングされます。
+
+html
+コードをコピーする
+<p class="black_123abc">Black Stone</p>
+ユニークなクラス名が必要な理由
+CSS モジュールでは、各クラス名をユニークな形式に変換することで、グローバルな名前空間の衝突を防止します。これにより、他のコンポーネントやスタイルシートで同じクラス名が定義されていても問題が起きません。
+
+ポイント
+styles は Next.js が自動生成するオブジェクトで、手動で作成する必要はありません。
+元のクラス名をキーとして持ち、ユニークなクラス名を値としてマッピングします。
+className 属性に利用することで、ユニークなクラス名を簡単に適用できます。
+これにより、モジュール化されたスタイルが安全かつ簡単に使用できるようになっています！
+
+================================================
+
+const styles = {
+  black: "black_123abc",   // ユニークなクラス名
+  placing: "placing_456def", // ユニークなクラス名
+};
+のようなものが出力されているファイルはどこかにプロジェクトの中にあって見ることはできるか？
+
+
+---------------------------
+
+残念ながら、Next.js が生成する styles オブジェクトは ビルド時に動的に作成される ものであり、プロジェクトの中に直接確認できる形で保存されているファイルはありません。
+
+生成されたクラス名を見る方法
+ただし、以下の方法で styles オブジェクトがどのように変換されているか確認することができます。
+
+1. HTML に出力されたクラス名を確認する
+ブラウザの開発者ツールを使えば、適用されているクラス名を確認できます。
+
+手順
+アプリをブラウザで開く。
+開発者ツール（F12）を開く。
+該当する要素を選択して HTML を確認。
+例
+html
+コードをコピーする
+<p class="black_123abc placing_456def"></p>
+2. JavaScript で styles オブジェクトの内容を確認する
+コンポーネント内で console.log(styles) を使うことで、現在の styles オブジェクトの内容をデバッグできます。
+
+tsx
+コードをコピーする
+import styles from './styles.module.css';
+
+console.log(styles); // styles オブジェクトの中身を確認
+ブラウザのコンソールに以下のような内容が表示されます。
+
+javascript
+コードをコピーする
+{
+  black: "black_123abc",
+  placing: "placing_456def"
+}
+3. ビルド後の CSS ファイルを見る
+ビルド後、生成された CSS は Next.js の .next ディレクトリ内に保存されます。
+
+手順
+
+アプリをビルドする（npm run build）。
+.next フォルダ内を確認。
+ユニークなクラス名を含む CSS が static フォルダ内に生成されています。
+例: .next/static/css/*.css
+注意: ファイルは最適化されていて読みにくい形式ですが、ユニークなクラス名が含まれていることは確認できます。
+
+4. Webpack の設定をカスタマイズ（必要に応じて）
+どうしても内部の仕組みを詳しく確認したい場合、Next.js のカスタム Webpack 設定を使って CSS モジュールの設定をデバッグできます。ただし、通常はその必要はありません。
+
+javascript
+コードをコピーする
+module.exports = {
+  webpack: (config, { dev }) => {
+    // ローダーの設定をデバッグするなど
+    console.log(config.module.rules);
+    return config;
+  },
+};
+まとめ
+styles オブジェクト自体の内容はプロジェクト内に直接保存されていませんが、ブラウザのコンソールや HTML 出力で確認可能です。
+ビルド後の .next フォルダ内に生成された CSS ファイルを見れば、ユニークなクラス名が確認できます。
+必要に応じて console.log を利用して開発中にデバッグするのが一般的です。
+
+
+
+
+
