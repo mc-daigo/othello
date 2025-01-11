@@ -1,7 +1,8 @@
 "use client";
 import { useContext } from "react";
 import styles from "./Board.module.css"
-import { GlobalValueContext } from "../providers/GlobalValueProvider";
+import { GlobalValueContext } from "@/components/providers/GlobalValueProvider"
+import { Square } from "@/components/Square";
 
 export const Board = () => {
   // contextのテンプレート
@@ -9,7 +10,7 @@ export const Board = () => {
   if (!context) {
     throw new Error("GlobalValueContext must be used within GlobalValueProvider");
   }
-  const {isBlack, changePlayer, countUp, squares, clickSquare, isAnimating, handleAnimationEnd} = context
+  const {isBlack, changePlayer, countUp, squares, clickSquare, isAnimating} = context
 
   return (
     <div className={styles.board}>
@@ -28,23 +29,30 @@ export const Board = () => {
                   {
                     row.map((stone, columnIndex) => {
                       return (
-                        <li
-                          className={styles.square}
-                          role="button"
-                          data-row={rowIndex}
-                          data-column={columnIndex}
-                          key={columnIndex}
-                          onClick={clickSquare}
-                        >
-                          <p
-                            className={stone
-                              .split(" ") // スペースで分割して配列に
-                              .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
-                              .join(" ")} // 配列をスペースで結合してクラス名文字列を生成}
-                            data-stone={stone}
-                            onAnimationEnd={() => handleAnimationEnd(rowIndex, columnIndex)}>
-                          </p>
-                        </li>
+                        <Square
+                          key={`${rowIndex}-${columnIndex}`} // keyをユニークにする
+                          row={rowIndex}
+                          column={columnIndex}
+                          stone={stone}
+                          // onClick={clickSquare}
+                        />
+                        // <li
+                        //   className={styles.square}
+                        //   role="button"
+                        //   data-row={rowIndex}
+                        //   data-column={columnIndex}
+                        //   key={columnIndex}
+                        //   onClick={clickSquare}
+                        // >
+                        //   <p
+                        //     className={stone
+                        //       .split(" ") // スペースで分割して配列に
+                        //       .map((cls) => styles[cls]) // 各クラス名をstylesオブジェクトから取得
+                        //       .join(" ")} // 配列をスペースで結合してクラス名文字列を生成}
+                        //     data-stone={stone}
+                        //     onAnimationEnd={() => handleAnimationEnd(rowIndex, columnIndex)}>
+                        //   </p>
+                        // </li>
                       )
                     }
                   )}
