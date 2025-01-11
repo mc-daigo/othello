@@ -1,0 +1,17 @@
+.main{
+  background-color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1000px;
+  margin:0 auto;
+}
+
+@media screen and (min-width: 481px) {
+	/* 481px以上に適用されるCSS（タブレット用） */
+  .main{
+    flex-direction: row-reverse;
+    align-items: stretch;
+  }
+}
