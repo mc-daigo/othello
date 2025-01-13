@@ -415,19 +415,18 @@ const flipStone = (row, column) => {
     let currentStep = 0;
     // 時間ごとに自動で繰り返し
     const interval = setInterval(() => {
-    // クラスをステップの配列から次に切り替える
-    stone.className = stepSequence[currentStep];
-    // ステップ数を追加
-    currentStep++;
-
-    // 最後のクラスに到達したらdataを書き換えて停止
-    if (currentStep > stepSequence.length -1) {
-      // 最終的にdata-stoneを最後のクラス名と同じに変更
-      stone.dataset.stone = stepSequence[stepSequence.length -1];
-      clearInterval(interval); // タイマー停止
-      isAnimating = false; // アニメーション終了
-    }
-  }, 50); // 50ms間隔でクラスを変更
+      // クラスをステップの配列から次に切り替える
+      stone.className = stepSequence[currentStep];
+      // ステップ数を追加
+      currentStep++;
+      // 最後のクラスに到達したらdataを書き換えて停止
+      if (currentStep > stepSequence.length -1) {
+        // 最終的にdata-stoneを最後のクラス名と同じに変更
+        stone.dataset.stone = stepSequence[stepSequence.length -1];
+        clearInterval(interval); // タイマー停止
+        isAnimating = false; // アニメーション終了
+      }
+    }, 50); // 50ms間隔でクラスを変更
   }
 }
 

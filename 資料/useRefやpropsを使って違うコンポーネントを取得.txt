@@ -1242,3 +1242,16 @@ tsx
 
 補足:
 key に関するエラーや警告が出る場合、それはReactの開発ツール (React Developer Tools) を利用すると詳細を確認できる場合があります。
+
+
+===========================
+<li
+  className={styles.square}
+  role="button"
+  data-row={row}
+  data-column={column}
+  onClick={handleClick}
+>
+とdatasetのdata-rowやdata-columnに直接数値を渡しているのだが
+typescriptでも問題はないか？
+
