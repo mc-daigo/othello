@@ -10,7 +10,7 @@ export const Board = () => {
   if (!context) {
     throw new Error("GlobalValueContext must be used within GlobalValueProvider");
   }
-  const {isBlack, changePlayer, countUp, squares, clickSquare, isAnimating} = context
+  const {isBlack, changePlayer, countUp, squares, isAnimating, changeStones} = context
 
   return (
     <div className={styles.board}>
@@ -62,238 +62,6 @@ export const Board = () => {
           })
         }
 
-
-
-
-
-
-{/* 
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="0" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="3">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="4">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="0" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="1" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="3">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="4">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="1" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="2" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="3">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="4">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="2" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="3" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="3">
-              <p className={styles.white} data-stone="white"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="4">
-              <p className={styles.black} data-stone="black"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="3" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="4" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="3">
-              <p className={styles.black} data-stone="black"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="4">
-              <p className={styles.white} data-stone="white"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="4" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="5" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="3">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="4">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="5" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="6" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="3">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="4">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="6" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
-        <li className={styles.row}>
-          <ul className={styles.column}>
-            <li className={styles.square} role="button" data-row="7" data-column="0">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="1">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="2">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="3">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="4">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="5">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="6">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-            <li className={styles.square} role="button" data-row="7" data-column="7">
-              <p className={styles.none} data-stone="none"></p>
-            </li>
-          </ul>
-        </li>
- */}
-
         <li className={styles.columnScale}>
           <ul>
             <li>a</li>
@@ -323,7 +91,7 @@ export const Board = () => {
       {/* 以下はテスト用なので最終的に削除 */}
       <div className={styles.testinput}>
         <select name="column" className={styles.selectColumn}>
-          <option value="">column</option>
+          <option value="0">column</option>
           <option value="0">a</option>
           <option value="1">b</option>
           <option value="2">c</option>
@@ -334,7 +102,7 @@ export const Board = () => {
           <option value="7">h</option>
         </select>
         <select name="row" className={styles.selectRow}>
-          <option value="">row</option>
+          <option value="0">row</option>
           <option value="0">1</option>
           <option value="1">2</option>
           <option value="2">3</option>
@@ -354,8 +122,8 @@ export const Board = () => {
           <option value="black">黒</option>
           <option value="white">白</option>
         </select>
-        <button className={styles.changeButton}>反転</button>
-        <button className={styles.countButton} onClick={countUp}>カウントアップ</button>
+        <button className={styles.changeButton} onClick={changeStones} disabled={isAnimating}>反転</button>
+        <button className={styles.countButton} onClick={countUp} disabled={isAnimating}>カウントアップ</button>
       </div>
 
     </div>
