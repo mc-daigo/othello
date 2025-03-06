@@ -77,6 +77,13 @@ export const  GlobalValueProvider = ({ children }: { children: ReactNode }) => {
   const [blackCount, setBlackCount] = useState(2)
   // 現在の白の石数
   const [whiteCount, setWhiteCount] = useState(2)
+
+// vercel用にとりあえず関数を使用
+setButtonLabel("パス")
+setIsPlaying(true)
+setBlackCount(2)
+setWhiteCount(2)
+
   // マスの状態の配列（初期状態用）
   const SQUARES: string[][] = [
     // ["none", "none", "none", "none", "none", "none", "none", "none",],
