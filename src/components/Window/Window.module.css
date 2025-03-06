@@ -26,6 +26,29 @@
   font-size: 20px;
   font-weight: bold;
 }
+.playersSP{
+  width: 15%;
+  text-align: center;
+  padding: 3px 0 0;
+}
+.scoreSP{
+  width: 70%;
+  display: flex;
+}
+.scoreSP p{
+  font-size: 24px;
+  font-weight: bold;
+}
+.scoreSP p:nth-of-type(even){
+  width: 10%;
+}
+.scoreSP p:nth-of-type(odd){
+  width: 45%;
+}
+.playersPC,
+.scorePC{
+  display: none;
+}
 .messageBox{
   margin-top: 10px;
   font-size: 16px;
@@ -72,6 +95,33 @@
     font-size: 30px;
     font-weight: bold;
   }
+  .playersSP,
+  .scoreSP{
+    display: none;
+  }
+  .playersPC,
+  .scorePC{
+    width: 100%;
+    display: flex;
+  }
+  .playersPC p{
+    width: 50%;
+    text-align: center;
+    font-size: 16px;
+  }
+  .scorePC p{
+    text-align: center;
+    margin-top: 10px;
+    font-size: 30px;
+    font-weight: bold;
+  }
+  .scorePC p:nth-of-type(even){
+    width: 10%;
+  }
+  .scorePC p:nth-of-type(odd){
+    width: 45%;
+  }
+  /* :nth-of-type(1) */
   .messageBox{
     margin-top: 20px;
   }

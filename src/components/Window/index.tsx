@@ -9,19 +9,43 @@ export const Window = () => {
   if (!context) {
     throw new Error("GlobalValueContext must be used within GlobalValueProvider");
   }
-  const {isBlack, turn} = context
+  const {isBlack, turn, buttonLabel, isPlaying, blackCount, whiteCount, clickButton, message} = context
 
   return (
     <div className={styles.window}>
       <div className={styles.turnBox}>
-        <p className={styles.turnPlayer}><span>{isBlack ? "黒" : "白"}</span>のターン</p>
-        <p className={styles.turnCount}>{`${turn}`}</p>
+      {/* プレイ中と結果発表で表示が変わる */}
+      {isPlaying ?
+        <>
+          <p className={styles.turnPlayer}><span>{isBlack ? '黒' : '白'}</span>のターン</p>
+          <p className={styles.turnCount}>{turn}</p>
+        </>
+        :
+        <>
+          <div className={styles.playersPC}>
+            <p>黒</p>
+            <p>白</p>
+          </div>
+          <div className={styles.scorePC}>
+            <p>{blackCount}</p>
+            <p>-</p>
+            <p>{whiteCount}</p>
+          </div>
+          <p className={styles.playersSP}>黒</p>
+          <div className={styles.scoreSP}>
+            <p>{blackCount}</p>
+            <p>-</p>
+            <p>{whiteCount}</p>
+          </div>
+          <p className={styles.playersSP}>白</p>
+        </>
+      }
       </div>
       <div className={styles.messageBox}>
-        <p className={styles.message}>一人で黒と白を順番に虚しく配置してください。<br />先手は黒からです。<br />石の置ける場所をクリックすれば進められます。</p>
+        <p className={styles.message}>{message}</p>
       </div>
       <div className={styles.buttonBox}>
-        <button className={styles.button}>パス</button>
+        <button className={styles.button} onClick={clickButton}>{buttonLabel}</button>
       </div>
     </div>
   );
